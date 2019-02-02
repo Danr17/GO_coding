@@ -4,14 +4,14 @@
 import tensorflow as tf
 import numpy as np
 
-# return an element at a time
-dataset1 = tf.data.Dataset.from_tensor_slices(tf.range(10,15))
+# return single element at a time
+dataset1 = tf.data.Dataset.from_tensor_slices(tf.range(10,20))
 
 # return tuple ata a time
 dataset2 = tf.data.Dataset.from_tensor_slices((tf.range(30,45,3), np.arange(60,70,2)))
 
 # Code to try out data present in datasets
-dataset = dataset2   # Change to required dataset
+dataset = dataset1   # Change to required dataset
 iterator = dataset.make_one_shot_iterator()
 next_element = iterator.get_next()
 
