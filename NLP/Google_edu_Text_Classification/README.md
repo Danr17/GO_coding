@@ -46,3 +46,9 @@ We have one module for each step in the text classification workflow.
 
 6.  *tune_model* - Contains example to demonstrate how you can find the best
     hyper-parameter values for your model.
+
+## Choose a Model:
+
+![Alt text](img/TextClassificationFlowchart.png?raw=true "TextClassificationFlowchart")
+
+sss
