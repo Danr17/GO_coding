@@ -35,7 +35,7 @@ dataset7 = tf.data.Dataset.from_generator(generator, (tf.int32, tf.int32), args=
 dataset8 = tf.data.Dataset.from_generator(generator, (tf.int32, tf.string), args=([3]))
 
 # Code to try out data present in datasets
-dataset = dataset8   # Change to required dataset
+dataset = dataset7   # Change to required dataset
 iterator = dataset.make_one_shot_iterator()
 next_element = iterator.get_next()
 
