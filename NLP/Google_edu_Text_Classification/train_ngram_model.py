@@ -23,7 +23,7 @@ FLAGS = None
 
 def train_ngram_model(data,
                       learning_rate=1e-3,
-                      epochs=20, # 1000 is default but i lower it to train on laptop
+                      epochs=100, # 1000 is default but i lower it to train on laptop
                       batch_size=128,
                       layers=2,
                       units=64,
@@ -94,7 +94,7 @@ def train_ngram_model(data,
         acc=history['val_acc'][-1], loss=history['val_loss'][-1]))
 
     # Save model.
-    model.save('imdb_mlp_model.h5')
+    model.save('models/imdb_mlp_model.h5')
     return history['val_acc'][-1], history['val_loss'][-1]
 
 
