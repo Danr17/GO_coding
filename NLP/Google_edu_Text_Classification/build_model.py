@@ -15,7 +15,7 @@ from tensorflow.python.keras.layers import Dense
 from tensorflow.python.keras.layers import Dropout
 from tensorflow.python.keras.layers import Embedding
 from tensorflow.python.keras.layers import SeparableConv1D
-from tensorflow.python.keras.layers import MaxPool1D
+from tensorflow.python.keras.layers import MaxPooling1D
 from tensorflow.python.keras.layers import GlobalAveragePooling1D
 
 def mlp_model(layers, units, dropout_rate, input_shape, num_classes):
@@ -70,7 +70,7 @@ def sepcnn_model(blocks,
         A sepCNN model instance.
     """
     op_units, op_activation = _get_last_layer_units_and_activation(num_classes)
-    model = models.Sequential
+    model = models.Sequential()
 
     # Add embedding layer. If pre-trained embedding is used add weights to the
     # embeddings layer and set trainable to input is_embedding_trainable flag.
