@@ -1,0 +1,1 @@
+Append recursively footer to the files in directories   
