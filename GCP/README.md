@@ -1,1 +1,0 @@
-scripts running on GCP
