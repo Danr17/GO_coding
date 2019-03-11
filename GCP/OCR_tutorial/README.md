@@ -1,0 +1,3 @@
+Learn how to perform optical character recognition (OCR) on Google Cloud Platform. This tutorial demonstrates how to upload image files to Google Cloud Storage, extract text from the images using the Google Cloud Vision API, translate the text using the Google Cloud Translation API, and save your translations back to Cloud Storage. Google Cloud Pub/Sub is used to queue various tasks and trigger the right Cloud Functions to carry them out.
+
+https://cloud.google.com/functions/docs/tutorials/ocr?authuser=0
