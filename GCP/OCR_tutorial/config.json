@@ -1,0 +1,7 @@
+{
+    "RESULT_TOPIC": "pubsub_saveresults",
+    "RESULT_BUCKET": "ocr_app_translate",
+    "TRANSLATE_TOPIC": "pubsub_translate",
+    "TRANSLATE": true,
+    "TO_LANG": ["en", "fr", "es", "ja", "ro"]
+    }
