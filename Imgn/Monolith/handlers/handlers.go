@@ -1,10 +1,14 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 // UploadFile uploads a file to the server
@@ -50,4 +54,43 @@ func jsonResponse(w http.ResponseWriter, code int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	fmt.Fprint(w, message)
+}
+
+//ListFiles create HTML snippet for all uploaded files
+func ListFiles(w http.ResponseWriter, r *http.Request) {
+	files, err := ioutil.ReadDir("./ui/gallery")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		jsonResponse(w, http.StatusInternalServerError, "Meh, data corruption :(")
+		return
+	}
+	type Entry struct {
+		Source string `json:"src"`
+		Meta   string `json:"meta"`
+	}
+	flist := []Entry{}
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), "jpg") ||
+			strings.HasSuffix(f.Name(), "jpeg") ||
+			strings.HasSuffix(f.Name(), "png") {
+			flist = append(flist, Entry{
+				Source: filepath.Join("gallery/", f.Name()),
+				Meta:   getMeta(filepath.Join("./ui/gallery/", f.Name())),
+			})
+		}
+
+	}
+	_ = json.NewEncoder(w).Encode(flist)
+}
+
+func getMeta(imgfile string) string {
+	imgmetafile := imgfile + ".meta"
+	if _, err := os.Stat(imgmetafile); err != nil {
+		return " no metadata avilable yet"
+	}
+	metadata, err := ioutil.ReadFile(imgmetafile)
+	if err != nil {
+		return "no metadata avilable yet"
+	}
+	return string(metadata)
 }
