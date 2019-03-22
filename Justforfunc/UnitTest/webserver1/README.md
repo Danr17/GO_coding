@@ -1,0 +1,1 @@
+test only doubleHandler function
