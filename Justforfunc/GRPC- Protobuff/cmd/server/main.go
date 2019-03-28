@@ -8,10 +8,10 @@ import (
 	"log"
 	"net"
 	"os"
+	"context"
 
 	"../../todo"
-	"github.com/gogo/protobuf/proto"
-	"golang.org/x/net/context"
+	"github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 )
 
@@ -26,11 +26,13 @@ func main() {
 	log.Fatal(srv.Serve(l))
 }
 
-type taskServer struct {}
+type taskServer struct{}
+
 type length int64
+
 const (
 	sizeOfLength = 8
-	dbPath = "mydb.pb"
+	dbPath       = "mydb.pb"
 )
 
 var endianness = binary.LittleEndian
@@ -40,18 +42,25 @@ func (taskServer) Add(ctx context.Context, text *todo.Text) (*todo.Task, error) 
 		Text: text.Text,
 		Done: false,
 	}
+
 	b, err := proto.Marshal(task)
 	if err != nil {
 		return nil, fmt.Errorf("could not encode task: %v", err)
 	}
+
 	f, err := os.OpenFile(dbPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
+		return nil, fmt.Errorf("could not open %s: %v", dbPath, err)
+	}
+
+	if err := binary.Write(f, endianness, length(len(b))); err != nil {
 		return nil, fmt.Errorf("could not encode length of message: %v", err)
 	}
 	_, err = f.Write(b)
 	if err != nil {
 		return nil, fmt.Errorf("could not write task to file: %v", err)
 	}
+
 	if err := f.Close(); err != nil {
 		return nil, fmt.Errorf("could not close file %s: %v", dbPath, err)
 	}
