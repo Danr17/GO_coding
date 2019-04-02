@@ -2,7 +2,10 @@ apiVersion: skaffold/v1beta7
 kind: Config
 build:
   artifacts:
-  - image: eu.gcr.io/apps-devel/skaffold-hello
+# google repository  
+#  - image: eu.gcr.io/apps-devel/skaffold-hello
+# Docker Hub repository
+  - image: danr1/skaffold-sync
 deploy:
   kubectl:
     manifests:
