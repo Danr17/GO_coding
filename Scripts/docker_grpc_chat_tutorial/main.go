@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/Danr17/GO_coding/Scripts/docker_grpc_chat_tutorial/proto"
-	grpc "google.golang.org/grpc"
-	glog "google.golang.org/grpc/grpclog"
+	"log"
+	"net"
 	"os"
 	"sync"
-	context "golang.org/x/net/context"
-	"net"
-	"log"
 
+	"github.com/Danr17/GO_coding/Scripts/docker_grpc_chat_tutorial/proto"
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+	glog "google.golang.org/grpc/grpclog"
 )
 
 var grpcLog glog.LoggerV2
@@ -21,9 +21,9 @@ func init() {
 //Connection struct
 type Connection struct {
 	stream proto.Broadcast_CreateStreamServer
-	id string
+	id     string
 	active bool
-	error chan error
+	error  chan error
 }
 
 //Server of Connections
@@ -35,22 +35,22 @@ type Server struct {
 func (s *Server) CreateStream(pconn *proto.Connect, stream proto.Broadcast_CreateStreamServer) error {
 	conn := &Connection{
 		stream: stream,
-		id: pconn.User.Id,
+		id:     pconn.User.Id,
 		active: true,
-		error: make(chan error),
+		error:  make(chan error),
 	}
 
 	s.Connection = append(s.Connection, conn)
 
-	return <- conn.error
+	return <-conn.error
 }
 
 //BroadcastMessage method
-func (s * Server) BroadcastMessage(ctx context.Context, msg *proto.Message) (*proto.Close, error){
+func (s *Server) BroadcastMessage(ctx context.Context, msg *proto.Message) (*proto.Close, error) {
 	wait := sync.WaitGroup{}
 	done := make(chan int)
 
-	for _, conn := range s.Connection{
+	for _, conn := range s.Connection {
 		wait.Add(1)
 
 		go func(msg *proto.Message, conn *Connection) {
@@ -83,7 +83,7 @@ func main() {
 
 	server := &Server{connections}
 	grpcServer := grpc.NewServer()
-	listnerer, err := net.Listen("tcp", "8080")
+	listnerer, err := net.Listen("tcp", ": 8080")
 	if err != nil {
 		log.Fatalf("error creating the server %v", err)
 	}
