@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package routeguide;
+
+// Points are represented as latitude-longitude pairs in the E7 representation
+// (degrees multiplied by 10**7 and rounded to the nearest integer).
+// Latitudes should be in the range +/- 90 degrees and longitude should be in
+// the range +/- 180 degrees (inclusive).
+message Point {
+    int32 latitude = 1;
+    int32 longitude = 2;
+}
+
+// A latitude-longitude rectangle, represented as two diagonally opposite
+// points "lo" and "hi".
+message Rectangle {
+    Point lo = 1;
+    Point hi = 2;
+}
+
+// A feature names something at a given point.
+// If a feature could not be named, the name is empty.
+message Feature {
+    string name = 1;
+    Point location = 2;
+  }
+
+//A RouteNote is a message sent while at a given point..
+message RouteNote {
+    Point location = 1;
+    string message = 2;
+}
+
+// A RouteSummary is received in response to a RecordRoute rpc.
+//
+// It contains the number of individual points received, the number of
+// detected features, and the total distance covered as the cumulative sum of
+// the distance between each point.
+message RouteSummary {
+    int32 point_count = 1;
+    int32 feature_count = 2;
+    int32 distance = 3;
+    int32 elapsed_time = 4;
+}
+
+// Interface exported by the server.
+service RouteGuide {
+
+    // Obtains the feature at a given position.
+    //
+    // A feature with an empty name is returned if there's no feature at the given
+    // position.
+    rpc GetFeature(Point) returns (Feature) {}
+
+    // A server-to-client streaming RPC.
+    //
+    // Obtains the Features available within the given Rectangle.  Results are
+    // streamed rather than returned at once (e.g. in a response message with a
+    // repeated field), as the rectangle may cover a large area and contain a
+    // huge number of features
+    rpc Listfeatures(Rectangle) returns (stream Feature) {}
+
+    // A client-to-server streaming RPC.
+    //
+    // Accepts a stream of Points on a route being traversed, returning a
+    // RouteSummary when traversal is completed.
+    rpc RecordRoute(stream Point) returns (RouteSummary) {}
+
+    // A Bidirectional streaming RPC.
+    //
+    // Accepts a stream of RouteNotes sent while a route is being traversed,
+    // while receiving other RouteNotes (e.g. from other users).
+    rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+}
