@@ -1,0 +1,1 @@
+https://github.com/dlsniper/gopherconuk/blob/master/README.md
