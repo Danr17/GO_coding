@@ -1,4 +1,4 @@
-FROM golang:1.11beta2-alpine3.8 AS build-env
+FROM golang:1.12.4-alpine3.9 AS build-env
 
 # Allow Go to retrive the dependencies for the build step
 RUN apk add --no-cache git
