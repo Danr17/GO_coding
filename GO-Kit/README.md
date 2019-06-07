@@ -1,0 +1,1 @@
+stringsvc -- https://gokit.io/examples/stringsvc.html
