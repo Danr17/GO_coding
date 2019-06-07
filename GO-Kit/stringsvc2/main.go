@@ -14,6 +14,7 @@ func main() {
 
 	var svc StringService
 	svc = stringService{}
+	svc = loggingMiddleware{logger, svc}
 
 	uppercaseHandler := httptransport.NewServer(
 		makeUppercaseEndpoint(svc),
