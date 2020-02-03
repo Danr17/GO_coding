@@ -7,7 +7,7 @@ This repository is a companion to my learning progress.
 
 - [x] Numpy
 - [x] Pandas
-- [ ] Matplotlib
+- [x] Matplotlib
 - [ ] The Machine Learning Landscape
 - [ ] End-to-End Machine Learning Project
 - [ ] Classification
