@@ -6,7 +6,7 @@ The source code is available at https://github.com/ageron/handson-ml2
 This repository is a companion to my learning progress.
 
 - [x] Numpy
-- [ ] Pandas
+- [x] Pandas
 - [ ] Matplotlib
 - [ ] The Machine Learning Landscape
 - [ ] End-to-End Machine Learning Project
