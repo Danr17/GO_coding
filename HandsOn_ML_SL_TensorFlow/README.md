@@ -8,9 +8,9 @@ This repository is a companion to my learning progress.
 - [x] Numpy
 - [x] Pandas
 - [x] Matplotlib
-- [ ] The Machine Learning Landscape
-- [ ] End-to-End Machine Learning Project
-- [ ] Classification
+- [x] The Machine Learning Landscape
+- [x] End-to-End Machine Learning Project
+- [x] Classification
 - [ ] Training Models
 - [ ] Support Vector Machines
 - [ ] Decision Trees
