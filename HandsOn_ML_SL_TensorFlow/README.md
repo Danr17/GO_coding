@@ -11,7 +11,7 @@ This repository is a companion to my learning progress.
 - [x] The Machine Learning Landscape
 - [x] End-to-End Machine Learning Project
 - [x] Classification
-- [ ] Training Models
+- [x] Training Models
 - [ ] Support Vector Machines
 - [ ] Decision Trees
 - [ ] Ensemble Learning and Random Forests
