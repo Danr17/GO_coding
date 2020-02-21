@@ -12,11 +12,11 @@ This repository is a companion to my learning progress.
 - [x] End-to-End Machine Learning Project
 - [x] Classification
 - [x] Training Models
-- [ ] Support Vector Machines
-- [ ] Decision Trees
-- [ ] Ensemble Learning and Random Forests
-- [ ] Dimensionality Reduction
-- [ ] Unsupervised Learning Techniques
+- [x] Support Vector Machines
+- [x] Decision Trees
+- [x] Ensemble Learning and Random Forests
+- [x] Dimensionality Reduction
+- [x] Unsupervised Learning Techniques
 - [ ] Introduction to Artificial Neural Networks with Keras
 - [ ] Training Deep Neural Networks
 - [ ] Custom Models and Training with TensorFlow
