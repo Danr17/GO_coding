@@ -17,8 +17,8 @@ This repository is a companion to my learning progress.
 - [x] Ensemble Learning and Random Forests
 - [x] Dimensionality Reduction
 - [x] Unsupervised Learning Techniques
-- [ ] Introduction to Artificial Neural Networks with Keras
-- [ ] Training Deep Neural Networks
+- [x] Introduction to Artificial Neural Networks with Keras
+- [x] Training Deep Neural Networks
 - [ ] Custom Models and Training with TensorFlow
 - [ ] Loading and Preprocessing Data with TensorFlow
 - [ ] Deep Computer Vision Using Convolutional Neural Networks
