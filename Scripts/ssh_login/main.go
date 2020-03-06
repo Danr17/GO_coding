@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"strings"
 	"syscall"
 
@@ -80,7 +81,7 @@ func main() {
 	conninit := sshinit.NewSSHInit(*username, *password)
 
 	var notWorking []string
-	addressBatch := make(chan string, 5)
+	addressBatch := make(chan string, 30)
 	results := make(chan string)
 
 	for i := 0; i < cap(addressBatch); i++ {
@@ -104,9 +105,15 @@ func main() {
 	close(addressBatch)
 	close(results)
 
-	fmt.Print("\n")
-	fmt.Println("We couldn't connect to following devices:")
+	f, err := os.OpenFile("output.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
 	for _, notWorkAdd := range notWorking {
-		fmt.Printf("%s \n", notWorkAdd)
+		if _, err = f.WriteString(notWorkAdd + "\n"); err != nil {
+			panic(err)
+		}
 	}
 }
