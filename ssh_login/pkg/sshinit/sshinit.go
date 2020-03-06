@@ -19,7 +19,7 @@ func NewSSHInit(username string, password string) *SSHInit {
 	}
 
 	return &SSHInit{
-		sshConfig: config,
+		Config: config,
 	}
 
 }
