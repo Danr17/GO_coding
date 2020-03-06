@@ -19,7 +19,7 @@ func connect(init *sshinit.SSHInit, addressBatch, results chan string) {
 		fmt.Printf("Trying to connect to %s \n", address)
 		client, err := ssh.Dial("tcp", address+":22", init.Config)
 		if err != nil {
-			fmt.Printf("%#v\n", err)
+			//fmt.Printf("%#v\n", err)
 			if _, ok := err.(*net.OpError); ok {
 				results <- "Unreachable" + " " + address
 				continue
