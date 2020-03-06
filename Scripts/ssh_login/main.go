@@ -4,11 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"strings"
+	"syscall"
 
 	"github.com/Danr17/GO_coding/ssh_login/pkg/parsefile"
 	"github.com/Danr17/GO_coding/ssh_login/pkg/sshinit"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func connect(init *sshinit.SSHInit, addressBatch, results chan string) {
@@ -16,7 +19,12 @@ func connect(init *sshinit.SSHInit, addressBatch, results chan string) {
 		fmt.Printf("Trying to connect to %s \n", address)
 		client, err := ssh.Dial("tcp", address+":22", init.Config)
 		if err != nil {
-			results <- address
+			//fmt.Printf("%#v\n", err)
+			if _, ok := err.(*net.OpError); ok {
+				results <- "Unreachable" + " " + address
+				continue
+			}
+			results <- "AuthFail" + " " + address
 			continue
 		}
 		// Each ClientConn can support multiple interactive sessions, represented by a Session.
@@ -26,7 +34,6 @@ func connect(init *sshinit.SSHInit, addressBatch, results chan string) {
 		}
 		defer session.Close()
 
-		fmt.Println("Done")
 		results <- "Done"
 
 		//log.Printf("Successfully connected to host %s", address)
@@ -49,9 +56,20 @@ func main() {
 
 	flag.Parse()
 
-	if *username == "" || *password == "" || *filename == "" {
+	if *username == "" || *filename == "" {
 		log.Fatalln("Either username, password or filename were not provided")
 	}
+
+	if *password == "" {
+		fmt.Print("Enter Password: \n")
+		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			log.Fatalf("Could not read the password: %s", err)
+		}
+		pass := strings.TrimSpace(string(bytePassword))
+		*password = pass
+	}
+
 	file := fmt.Sprintf("%s.txt", *filename)
 
 	addresses, err := parsefile.Parse(file)
@@ -62,7 +80,7 @@ func main() {
 	conninit := sshinit.NewSSHInit(*username, *password)
 
 	var notWorking []string
-	addressBatch := make(chan string, 3)
+	addressBatch := make(chan string, 5)
 	results := make(chan string)
 
 	for i := 0; i < cap(addressBatch); i++ {
@@ -89,6 +107,6 @@ func main() {
 	fmt.Print("\n")
 	fmt.Println("We couldn't connect to following devices:")
 	for _, notWorkAdd := range notWorking {
-		fmt.Printf("To %s can't connect \n", notWorkAdd)
+		fmt.Printf("%s \n", notWorkAdd)
 	}
 }
