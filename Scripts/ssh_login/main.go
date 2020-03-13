@@ -54,6 +54,7 @@ func main() {
 	username := flag.String("user", "", "provide an username")
 	password := flag.String("pass", "", "provide a password")
 	filename := flag.String("file", "test.txt", "provide a filename like test.txt")
+	interactive := flag.Bool("interactive", false, "interactive mode")
 
 	flag.Parse()
 
@@ -78,7 +79,7 @@ func main() {
 		log.Fatalf("could parse the file %s: %v", file, err)
 	}
 
-	conninit := sshinit.NewSSHInit(*username, *password)
+	conninit := sshinit.NewSSHInit(*username, *password, *interactive)
 
 	var notWorking []string
 	addressBatch := make(chan string, 30)
