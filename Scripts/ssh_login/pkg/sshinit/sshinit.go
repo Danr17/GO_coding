@@ -24,7 +24,7 @@ func NewSSHInit(username string, password string, interactive bool) *SSHInit {
 			"ecdh-sha2-nistp384", "ecdh-sha2-nistp521", "diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"},
 	}
 
-	m, _ := time.ParseDuration("3s")
+	m, _ := time.ParseDuration("4s")
 
 	configClient := &ssh.ClientConfig{
 		Config: *config,
