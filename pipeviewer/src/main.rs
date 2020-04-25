@@ -1,64 +1,39 @@
-use clap::{App, Arg};
-use std::env;
-use std::fs::File;
-use std::io::{self, BufReader, BufWriter, ErrorKind, Read, Result, Write};
+pub mod args;
+pub mod read;
+pub mod stats;
+pub mod write;
 
-const CHUNK_SIZE: usize = 16 * 1024;
+use crossbeam::channel::{bounded, unbounded};
+use std::io::Result;
+use std::thread;
+
+use args::Args;
+use read::read_loop;
+use stats::stats_loop;
+use write::write_loop;
 
 fn main() -> Result<()> {
-    let matches = App::new("pipeviewer")
-        .arg(Arg::with_name("infile").help("Read from a file instead of stdin"))
-        .arg(
-            Arg::with_name("outfile")
-                .short("o")
-                .long("outfile")
-                .takes_value(true)
-                .help("Write output to a file instead of stdout"),
-        )
-        .arg(Arg::with_name("silent").short("s").long("silent"))
-        .get_matches();
+    let args = Args::parse();
+    let Args {
+        infile,
+        outfile,
+        silent,
+    } = args;
 
-    let infile = matches.value_of("infile").unwrap_or_default();
-    let outfile = matches.value_of("outfile").unwrap_or_default();
-    let silent = if matches.is_present("silent") {
-        true
-    } else {
-        !env::var("PV_SILENT").unwrap_or_default().is_empty()
-    };
+    let (stats_tx, stats_rx) = unbounded();
+    let (write_tx, write_rx) = bounded(1024);
 
-    let mut reader: Box<dyn Read> = if !infile.is_empty() {
-        Box::new(BufReader::new(File::open(infile)?))
-    } else {
-        Box::new(BufReader::new(io::stdin()))
-    };
+    let read_handle = thread::spawn(move || read_loop(&infile, stats_tx, write_tx));
+    let stats_handle = thread::spawn(move || stats_loop(silent, stats_rx));
+    let write_handle = thread::spawn(move || write_loop(&outfile, write_rx));
 
-    let mut writer: Box<dyn Write> = if !outfile.is_empty() {
-        Box::new(BufWriter::new(File::create(outfile)?))
-    } else {
-        Box::new(BufWriter::new(io::stdout()))
-    };
+    let read_io_result = read_handle.join().unwrap();
+    let stats_io_result = stats_handle.join().unwrap();
+    let write_io_result = write_handle.join().unwrap();
 
-    let mut total_bytes = 0;
-    let mut buffer = [0; CHUNK_SIZE];
-    loop {
-        let num_read = match reader.read(&mut buffer) {
-            Ok(0) => break,
-            Ok(x) => x,
-            Err(_) => break,
-        };
-        total_bytes += num_read;
-        if !silent {
-            eprint!("\r{}", total_bytes);
-        }
-        if let Err(e) = writer.write_all(&buffer[..num_read]) {
-            if e.kind() == ErrorKind::BrokenPipe {
-                break;
-            }
-            return Err(e);
-        }
-    }
-    if !silent {
-        eprintln!("\r{}", total_bytes)
-    }
+    read_io_result?;
+    stats_io_result?;
+    write_io_result?;
+
     Ok(())
 }
