@@ -1,4 +1,4 @@
-# rich_test
+# test_flutter_basics
 
 A new Flutter project.
 

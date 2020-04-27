@@ -1,4 +1,4 @@
-package com.example.rich_test
+package com.example.test_flutter_basics
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
