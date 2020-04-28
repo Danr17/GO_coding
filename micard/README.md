@@ -2,4 +2,4 @@
 
 A simple My Card. (Using Text, Column, ListTile, Card & CircleAvatar Widgets)  
 
-![example](images/micard.png "Simple card project")
+<img src="images/micard.png" alt="drawing" width="250"/>
