@@ -1,0 +1,1 @@
+The code recursively copies a directory tree from one place to another on disk.
