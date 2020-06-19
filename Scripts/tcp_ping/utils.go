@@ -1,9 +1,9 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -30,4 +30,18 @@ func FormatIP(IP string) string {
 	}
 
 	return host
+}
+
+func convertTime(timeout string) (time.Duration, error) {
+	var result time.Duration
+	if res, err := strconv.Atoi(timeout); err == nil {
+		result = time.Duration(res) * time.Millisecond
+	} else {
+		result, err = time.ParseDuration(timeout)
+		if err != nil {
+			fmt.Println("parse timeout failed", err)
+			return 1 * time.Second, err
+		}
+	}
+	return result, nil
 }

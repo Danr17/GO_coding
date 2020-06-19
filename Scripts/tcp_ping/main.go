@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
-	//	"time"
 )
 
 const usage = `1. ping over tcp
@@ -38,23 +38,34 @@ func main() {
 		os.Exit(1)
 	}
 
+	var err error
 	var port = 443
 	if len(args) == 2 {
-		port, err := strconv.Atoi(args[2])
+		port, err = strconv.Atoi(args[1])
 		if err != nil {
 			fmt.Println("port should be integer")
 			return
 		}
 	}
 
-	host := args[1]
+	host := args[0]
 	parseHost := FormatIP(host)
+
+	timeoutDuration, err := convertTime(*timeout)
+	if err != nil {
+		log.Fatalln("The value provided for **timeout** is wrong")
+	}
+	intervalDuration, err := convertTime(*interval)
+	if err != nil {
+		log.Fatalln("The value provided for **interval** is wrong")
+	}
+
 	target := Target{
-		//	Timeout:  timeoutDuration,
-		//	Interval: intervalDuration,
-		Host:    parseHost,
-		Port:    port,
-		Counter: *counter,
+		Timeout:  timeoutDuration,
+		Interval: intervalDuration,
+		Host:     parseHost,
+		Port:     port,
+		Counter:  *counter,
 	}
 
 	if *isWeb == false {

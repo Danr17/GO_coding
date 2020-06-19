@@ -21,27 +21,6 @@ func (target Target) String() string {
 	return fmt.Sprintf("%s:%d", target.Host, target.Port)
 }
 
-// Pinger is a ping interface
-type Pinger interface {
-	Start() <-chan struct{}
-	Stop()
-	Result() *Result
-	SetTarget(target *Target)
-}
-
-// Ping is a ping interface
-type Ping interface {
-	Start() <-chan struct{}
-
-	Host() string
-	Port() int
-	Counter() int
-
-	Stop()
-
-	Result() Result
-}
-
 // Result ...
 type Result struct {
 	Counter        int

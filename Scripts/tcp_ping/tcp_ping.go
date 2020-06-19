@@ -13,8 +13,6 @@ type TCPing struct {
 	result *Result
 }
 
-var _ Pinger = (*TCPing)(nil)
-
 // NewTCPing return a new TCPing
 func NewTCPing() *TCPing {
 	tcping := TCPing{
