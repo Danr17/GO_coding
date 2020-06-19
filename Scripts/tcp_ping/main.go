@@ -6,23 +6,20 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 )
 
 const usage = `1. ping over tcp
     > tcping google.com
 2. ping over tcp with custom port
-    > tcping google.com 443
-3. ping over http
-    > tcping -H google.com
-4. ping with URI schema
-    > tcping http://hui.lu`
+    > tcping google.com -port=443
+3. Web Ping over provided sources
+    > tcping -web=true -file=devices.txt`
 
 var (
 	isWeb     = flag.Bool("web", false, "enable this if you want to see it on Web")
-	inWebPort = flag.Int("port", 443, "enable this if you want to see it on Web")
 	inWebFile = flag.String("file", "", "specify the filename")
+	port      = flag.Int("port", 443, "enable this if you want to see it on Web")
 	counter   = flag.Int("counter", 4, "ping counter")
 	timeout   = flag.String("timeout", "1s", `connect timeout, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
 	interval  = flag.String("interval", "1s", `ping interval, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
@@ -36,16 +33,6 @@ func main() {
 	if len(args) < 1 {
 		fmt.Println(usage)
 		os.Exit(1)
-	}
-
-	var err error
-	var port = 443
-	if len(args) == 2 {
-		port, err = strconv.Atoi(args[1])
-		if err != nil {
-			fmt.Println("port should be integer")
-			return
-		}
 	}
 
 	host := args[0]
@@ -64,11 +51,11 @@ func main() {
 		Timeout:  timeoutDuration,
 		Interval: intervalDuration,
 		Host:     parseHost,
-		Port:     port,
+		Port:     *port,
 		Counter:  *counter,
 	}
 
-	if *isWeb == false {
+	if !*isWeb {
 		pinger := NewTCPing()
 		pinger.SetTarget(&target)
 		pingerDone := pinger.Start()
@@ -80,10 +67,38 @@ func main() {
 		}
 
 		fmt.Println(pinger.Result())
+		return
 	}
 
 	if *inWebFile == "" {
-		fmt.Println(`Filename and port number should be specified:
+		fmt.Println(`The filename should be specified (port is 443 default if not changed):
 Example usage: tcp_ping web=true file="filename" port=443`)
 	}
+	hosts, err := parse(*inWebFile)
+	if err != nil {
+		log.Fatalf("could parse the file %s: %v", *inWebFile, err)
+	}
+	pinger := NewWebPing()
+	targets := []*Target{}
+	for _, host := range hosts {
+		target = Target{
+			Timeout:  timeoutDuration,
+			Interval: intervalDuration,
+			Host:     host.ip,
+			Port:     *port,
+			Counter:  *counter,
+		}
+		targets = append(targets, &target)
+	}
+	pinger.SetTarget(targets)
+	pingerDone := pinger.Start()
+	select {
+	case <-pingerDone:
+		break
+	case <-sigs:
+		break
+	}
+
+	// fmt.Println(pinger.Result())
+	return
 }
