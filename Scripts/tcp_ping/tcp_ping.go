@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"time"
 )
@@ -35,17 +36,13 @@ func (tcping TCPing) Result() *Result {
 }
 
 // Start a tcping
-func (tcping TCPing) Start() <-chan struct{} {
+func (tcping TCPing) Start() {
 	go func() {
 		t := time.NewTicker(tcping.target.Interval)
 		defer t.Stop()
 		for {
 			select {
 			case <-t.C:
-				if tcping.result.Counter >= tcping.target.Counter && tcping.target.Counter != 0 {
-					tcping.Stop()
-					return
-				}
 				duration, remoteAddr, err := tcping.ping()
 				tcping.result.Counter++
 
@@ -68,12 +65,17 @@ func (tcping TCPing) Start() <-chan struct{} {
 					}
 					tcping.result.TotalDuration += duration
 				}
-			case <-tcping.done:
-				return
+				if tcping.result.Counter >= tcping.target.Counter && tcping.target.Counter != 0 {
+					log.Println("ping done for site", tcping.target.Host)
+					tcping.Stop()
+					break
+				}
+				// case <-tcping.done:
+				// 	log.Println("received done signal for ", tcping.target.Host)
+				// 	return
 			}
 		}
 	}()
-	return tcping.done
 }
 
 // Stop the tcping

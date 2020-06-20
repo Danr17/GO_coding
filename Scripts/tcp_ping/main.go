@@ -27,9 +27,15 @@ var (
 
 func main() {
 	flag.Parse()
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	args := flag.Args()
+
+	sigs := make(chan os.Signal, 1)
+	done := make(chan struct{}, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sigs
+		close(done)
+	}()
 
 	timeoutDuration, err := convertTime(*timeout)
 	if err != nil {
@@ -59,13 +65,14 @@ func main() {
 
 		pinger := NewTCPing()
 		pinger.SetTarget(&target)
-		pingerDone := pinger.Start()
-		select {
-		case <-pingerDone:
-			break
-		case <-sigs:
-			break
-		}
+		pinger.Start()
+		<-pinger.done
+		// select {
+		// case <-pingerDone:
+		// 	break
+		// case <-sigs:
+		// 	break
+		// }
 
 		fmt.Println(pinger.Result())
 		return
@@ -92,7 +99,7 @@ Example usage: tcp_ping web=true file="filename" port=443`)
 	}
 	pinger := NewWebPing(targets)
 	//	pingerDone := pinger.Start()
-	pinger.Start()
+	pinger.Start(done)
 	select {
 	// case <-pingerDone:
 	//		break

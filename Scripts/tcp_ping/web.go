@@ -40,56 +40,66 @@ func NewWebPing(targets []*Target) *WebPing {
 }
 
 // Start a webping
-func (webping WebPing) Start() {
+func (webping WebPing) Start(done chan struct{}) {
 	var wg sync.WaitGroup
+startLoop:
 	for {
-		wg.Add(len(webping.sites))
+		select {
+		case <-done:
+			break startLoop
+		default:
 
-		for _, site := range webping.sites {
-			go func(site *website) {
-				defer wg.Done()
-				t := time.NewTicker(site.target.Interval)
-				defer t.Stop()
-				for {
-					select {
-					case <-t.C:
-						if site.result.Counter >= site.target.Counter && site.target.Counter != 0 {
-							log.Printf("site %s and counter %d", site.target.Host, site.result.Counter)
-							site.Stop()
-							//return
+			wg.Add(len(webping.sites))
+
+			for _, site := range webping.sites {
+				go func(site *website) {
+					defer wg.Done()
+					t := time.NewTicker(site.target.Interval)
+					defer t.Stop()
+				pingLoop:
+					for {
+						select {
+						case <-t.C:
+							duration, remoteAddr, err := site.ping()
+							site.result.Counter++
+
+							if err != nil {
+								fmt.Printf("Ping %s - failed: %s\n", site.target, err)
+							} else {
+								fmt.Printf("Ping %s(%s) - Connected - time=%s\n", site.target, remoteAddr, duration)
+
+								if site.result.MinDuration == 0 {
+									site.result.MinDuration = duration
+								}
+								if site.result.MaxDuration == 0 {
+									site.result.MaxDuration = duration
+								}
+								site.result.SuccessCounter++
+								if duration > site.result.MaxDuration {
+									site.result.MaxDuration = duration
+								} else if duration < site.result.MinDuration {
+									site.result.MinDuration = duration
+								}
+								site.result.TotalDuration += duration
+							}
+							if site.result.Counter >= site.target.Counter && site.target.Counter != 0 {
+								log.Printf("site %s and counter %d", site.target.Host, site.result.Counter)
+								site.result.Counter = 0
+								//site.Stop()
+								//return
+								//site.done <- struct{}{}
+								break pingLoop
+							}
+							// case <-done:
+							// 	log.Printf("site %s is done", site.target.Host)
+							// 	break startLoop
 						}
-						duration, remoteAddr, err := site.ping()
-						site.result.Counter++
-
-						if err != nil {
-							fmt.Printf("Ping %s - failed: %s\n", site.target, err)
-						} else {
-							fmt.Printf("Ping %s(%s) - Connected - time=%s\n", site.target, remoteAddr, duration)
-
-							if site.result.MinDuration == 0 {
-								site.result.MinDuration = duration
-							}
-							if site.result.MaxDuration == 0 {
-								site.result.MaxDuration = duration
-							}
-							site.result.SuccessCounter++
-							if duration > site.result.MaxDuration {
-								site.result.MaxDuration = duration
-							} else if duration < site.result.MinDuration {
-								site.result.MinDuration = duration
-							}
-							site.result.TotalDuration += duration
-						}
-					case <-site.done:
-						log.Printf("site %s is done", site.target.Host)
-						break
-						//return
 					}
-				}
-			}(site)
+				}(site)
+			}
+			wg.Wait()
+			time.Sleep(10 * time.Second)
 		}
-		wg.Wait()
-		time.Sleep(5 * time.Second)
 	}
 }
 
