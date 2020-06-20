@@ -9,31 +9,33 @@ import (
 type website struct {
 	target *Target
 	result *Result
+	done   chan struct{}
 }
 
 //WebPing data
 type WebPing struct {
 	sites []*website
-	done  chan struct{}
 }
 
 // NewWebPing return a new WebPing
-func NewWebPing() *WebPing {
-
-	webping := WebPing{
-		done: make(chan struct{}),
+func NewWebPing(targets []*Target) *WebPing {
+	sites := []website{}
+	for _, target := range targets {
+		site := website{
+			target: target,
+			done:   make(chan struct{}),
+		}
+		if site.result == nil {
+			site.result = &Result{Target: target}
+		}
+		sites = append(sites, site)
 	}
-	return &webping
+	return &WebPing{sites: sites}
 }
 
 // SetTarget set target for WebPing
 func (webping *WebPing) SetTarget(targets []*Target) {
-	for i, target := range targets {
-		webping.sites[i].target = target
-		if webping.sites[i].result == nil {
-			webping.sites[i].result = &Result{Target: target}
-		}
-	}
+
 }
 
 // Start a webping
