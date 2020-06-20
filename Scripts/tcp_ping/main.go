@@ -30,13 +30,6 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	args := flag.Args()
-	if len(args) < 1 {
-		fmt.Println(usage)
-		os.Exit(1)
-	}
-
-	host := args[0]
-	parseHost := FormatIP(host)
 
 	timeoutDuration, err := convertTime(*timeout)
 	if err != nil {
@@ -47,15 +40,23 @@ func main() {
 		log.Fatalln("The value provided for **interval** is wrong")
 	}
 
-	target := Target{
-		Timeout:  timeoutDuration,
-		Interval: intervalDuration,
-		Host:     parseHost,
-		Port:     *port,
-		Counter:  *counter,
-	}
-
 	if !*isWeb {
+		if len(args) < 1 {
+			fmt.Println(usage)
+			os.Exit(1)
+		}
+
+		host := args[0]
+		parseHost := FormatIP(host)
+
+		target := Target{
+			Timeout:  timeoutDuration,
+			Interval: intervalDuration,
+			Host:     parseHost,
+			Port:     *port,
+			Counter:  *counter,
+		}
+
 		pinger := NewTCPing()
 		pinger.SetTarget(&target)
 		pingerDone := pinger.Start()
@@ -78,23 +79,23 @@ Example usage: tcp_ping web=true file="filename" port=443`)
 	if err != nil {
 		log.Fatalf("could parse the file %s: %v", *inWebFile, err)
 	}
-	pinger := NewWebPing()
 	targets := []*Target{}
 	for _, host := range hosts {
-		target = Target{
+		webtarget := Target{
 			Timeout:  timeoutDuration,
 			Interval: intervalDuration,
 			Host:     host.ip,
 			Port:     *port,
 			Counter:  *counter,
 		}
-		targets = append(targets, &target)
+		targets = append(targets, &webtarget)
 	}
-	pinger.SetTarget(targets)
-	pingerDone := pinger.Start()
+	pinger := NewWebPing(targets)
+	//	pingerDone := pinger.Start()
+	pinger.Start()
 	select {
-	case <-pingerDone:
-		break
+	// case <-pingerDone:
+	//		break
 	case <-sigs:
 		break
 	}
