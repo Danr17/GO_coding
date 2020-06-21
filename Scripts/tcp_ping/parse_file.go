@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+//Host holds host informations
 type Host struct {
 	hostname string
 	ip       string
