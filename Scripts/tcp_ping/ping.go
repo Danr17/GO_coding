@@ -21,7 +21,7 @@ func (target Target) String() string {
 	return fmt.Sprintf("%s:%d", target.Host, target.Port)
 }
 
-// Result ...
+// Result holds ping results
 type Result struct {
 	Counter        int
 	SuccessCounter int

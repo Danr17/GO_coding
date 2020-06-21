@@ -50,8 +50,8 @@ startLoop:
 			}
 			wg.Wait()
 
-			time.Sleep(5 * time.Second)
 		}
+		time.Sleep(5 * time.Second)
 	}
 }
 
@@ -71,18 +71,19 @@ pingLoop:
 			} else {
 				fmt.Printf("Ping %s(%s) - Connected - time=%s\n", site.target, remoteAddr, duration)
 
-				if site.result.MinDuration == 0 {
+				if site.result.Counter == 1 {
 					site.result.MinDuration = duration
-				}
-				if site.result.MaxDuration == 0 {
 					site.result.MaxDuration = duration
 				}
+
+				switch {
+				case duration > site.result.MaxDuration:
+					site.result.MaxDuration = duration
+				case duration < site.result.MinDuration:
+					site.result.MinDuration = duration
+				}
+
 				site.result.SuccessCounter++
-				if duration > site.result.MaxDuration {
-					site.result.MaxDuration = duration
-				} else if duration < site.result.MinDuration {
-					site.result.MinDuration = duration
-				}
 				site.result.TotalDuration += duration
 			}
 			if site.result.Counter >= site.target.Counter && site.target.Counter != 0 {

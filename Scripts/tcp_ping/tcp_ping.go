@@ -51,18 +51,19 @@ func (tcping TCPing) Start() {
 				} else {
 					fmt.Printf("Ping %s(%s) - Connected - time=%s\n", tcping.target, remoteAddr, duration)
 
-					if tcping.result.MinDuration == 0 {
+					if tcping.result.Counter == 1 {
 						tcping.result.MinDuration = duration
-					}
-					if tcping.result.MaxDuration == 0 {
 						tcping.result.MaxDuration = duration
 					}
+
+					switch {
+					case duration > tcping.result.MaxDuration:
+						tcping.result.MaxDuration = duration
+					case duration < tcping.result.MinDuration:
+						tcping.result.MinDuration = duration
+					}
+
 					tcping.result.SuccessCounter++
-					if duration > tcping.result.MaxDuration {
-						tcping.result.MaxDuration = duration
-					} else if duration < tcping.result.MinDuration {
-						tcping.result.MinDuration = duration
-					}
 					tcping.result.TotalDuration += duration
 				}
 				if tcping.result.Counter >= tcping.target.Counter && tcping.target.Counter != 0 {
@@ -70,9 +71,6 @@ func (tcping TCPing) Start() {
 					tcping.Stop()
 					break
 				}
-				// case <-tcping.done:
-				// 	log.Println("received done signal for ", tcping.target.Host)
-				// 	return
 			}
 		}
 	}()
