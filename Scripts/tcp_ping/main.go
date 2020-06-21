@@ -12,11 +12,13 @@ import (
 )
 
 const usage = `1. ping over tcp
-    > tcping google.com
+    > tcp_ping-linux-amd64 google.com
 2. ping over tcp with custom port
-    > tcping google.com -port=443
-3. Web Ping over provided sources
-    > tcping -web=true -file=devices.txt`
+    > tcp_ping-linux-amd64 google.com -port=443
+3. ping over tcp using counter and interval
+    > tcp_ping-linux-amd64 google.com -counter=10 -interval="3s"
+4. Web Ping over provided sources
+    > tcp_ping-linux-amd64 -web -file=example.txt`
 
 var (
 	isWeb     = flag.Bool("web", false, "enable this if you want to see it on Web")
