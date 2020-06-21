@@ -25,6 +25,8 @@ func (target Target) String() string {
 type Result struct {
 	Counter        int
 	SuccessCounter int
+	Status         bool
+	LastSeen       string
 	Target         *Target
 
 	MinDuration   time.Duration

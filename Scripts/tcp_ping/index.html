@@ -17,7 +17,7 @@
       <div class="container-fluid">
         <div class="navbar-header">
           <a class="navbar-brand" href="/">
-            <img alt="Brand" src="" height="42" width="42">
+            <a class="navbar-brand" href="#">Web TCP_Ping</a>
           </a>
         </div>
         </div>
@@ -33,8 +33,8 @@
                         <th scope="col">#</th>
                         <th scope="col">Host</th>
                         <th scope="col">IP</th>
-                        <!-- <th scope="col">Status</th>
-                        <th scope="col">Date</th> -->
+                        <th scope="col">Status</th>
+                        <th scope="col">Last Online</th>
                         <th scope="col">Min</th>
                         <th scope="col">Max</th>
                         <th scope="col">Avg</th>
@@ -44,12 +44,13 @@
                       {{range $i, $a := .Items}}
                       <tr>
                         <th scope="row">{{$i}}</th>
-                        <td style="text-align: left">{{$a.target.Host}}</td>
-                        <td style="text-align: left">{{$a.target.Host}}</td>
-                        <!-- <td style="text-align: left">{{$a.ExpDate.Time.Format "Jan 02, 2006"}}</td> -->
-                        <td style="text-align: left">{{$a.result.MinDuration}}</td>
-                        <td style="text-align: left">{{$a.result.MaxDuration}}</td>
-                        <td style="text-align: left">{{$a.result.Avg}}</td>
+                        <td style="text-align: left">{{$a.Target.Host}}</td>
+                        <td style="text-align: left">{{$a.Target.Host}}</td>
+                        <td style="text-align: left">{{$a.Result.Status}}</td>
+                        <td style="text-align: left">{{$a.Result.LastSeen}}</td>
+                        <td style="text-align: left">{{$a.Result.MinDuration}}</td>
+                        <td style="text-align: left">{{$a.Result.MaxDuration}}</td>
+                        <td style="text-align: left">{{$a.Result.Avg}}</td>
                         <td style="text-align: left">
 
                         </td>

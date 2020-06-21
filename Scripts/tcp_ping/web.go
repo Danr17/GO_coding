@@ -9,8 +9,8 @@ import (
 )
 
 type website struct {
-	target *Target
-	result *Result
+	Target *Target
+	Result *Result
 }
 
 //WebPing data
@@ -23,10 +23,10 @@ func NewWebPing(targets []*Target) *WebPing {
 	sites := []*website{}
 	for _, target := range targets {
 		site := website{
-			target: target,
+			Target: target,
 		}
-		if site.result == nil {
-			site.result = &Result{Target: target}
+		if site.Result == nil {
+			site.Result = &Result{Target: target}
 		}
 		sites = append(sites, &site)
 	}
@@ -57,36 +57,39 @@ startLoop:
 
 func pingHost(site *website, wg *sync.WaitGroup) {
 	defer wg.Done()
-	t := time.NewTicker(site.target.Interval)
+	t := time.NewTicker(site.Target.Interval)
 	defer t.Stop()
 pingLoop:
 	for {
 		select {
 		case <-t.C:
 			duration, _, err := site.ping()
-			site.result.Counter++
+			site.Result.Counter++
 
 			if err != nil {
 				break
 			} else {
-				if site.result.Counter == 1 {
-					site.result.MinDuration = duration
-					site.result.MaxDuration = duration
+				if site.Result.Counter == 1 {
+					site.Result.MinDuration = duration
+					site.Result.MaxDuration = duration
 				}
 
 				switch {
-				case duration > site.result.MaxDuration:
-					site.result.MaxDuration = duration
-				case duration < site.result.MinDuration:
-					site.result.MinDuration = duration
+				case duration > site.Result.MaxDuration:
+					site.Result.MaxDuration = duration
+				case duration < site.Result.MinDuration:
+					site.Result.MinDuration = duration
 				}
 
-				site.result.SuccessCounter++
-				site.result.TotalDuration += duration
+				site.Result.SuccessCounter++
+				site.Result.TotalDuration += duration
 			}
-			if site.result.Counter >= site.target.Counter && site.target.Counter != 0 {
-				log.Printf("site %s and counter %d", site.target.Host, site.result.Counter)
-				site.result.Counter = 0
+			if site.Result.Counter >= site.Target.Counter && site.Target.Counter != 0 {
+				log.Printf("site %s and counter %d", site.Target.Host, site.Result.Counter)
+				site.Result.Counter = 0
+				site.Result.Status = true
+				hour, min, sec := time.Now().Local().Clock()
+				site.Result.LastSeen = string(hour) + string(min) + string(sec)
 				break pingLoop
 			}
 		}
@@ -96,7 +99,7 @@ pingLoop:
 func (site *website) ping() (time.Duration, net.Addr, error) {
 	var remoteAddr net.Addr
 	duration, errIfce := timeIt(func() interface{} {
-		conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", site.target.Host, site.target.Port), site.target.Timeout)
+		conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", site.Target.Host, site.Target.Port), site.Target.Timeout)
 		if err != nil {
 			return err
 		}
