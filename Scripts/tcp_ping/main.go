@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 const usage = `1. ping over tcp
@@ -29,8 +31,13 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
+	//catch CTRL-C
 	sigs := make(chan os.Signal, 1)
+	//notify web to stop
 	done := make(chan struct{}, 1)
+	//channel to listen for errors coming from the listener.
+	serverErrors := make(chan error, 1)
+
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigs
@@ -77,7 +84,6 @@ func main() {
 		fmt.Println(pinger.Result())
 		return
 	}
-
 	if *inWebFile == "" {
 		fmt.Println(`The filename should be specified (port is 443 default if not changed):
 Example usage: tcp_ping web=true file="filename" port=443`)
@@ -97,14 +103,33 @@ Example usage: tcp_ping web=true file="filename" port=443`)
 		}
 		targets = append(targets, &webtarget)
 	}
+
 	pinger := NewWebPing(targets)
-	//	pingerDone := pinger.Start()
-	pinger.Start(done)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", htmlPage(pinger))
+
+	server := http.Server{
+		Addr:         "localhost:8080",
+		Handler:      mux,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
+	go func() {
+		log.Println("API listening on port 8080. Open browser: http://localhost:8080")
+		serverErrors <- server.ListenAndServe()
+	}()
+
+	go pinger.Start(done)
+
 	select {
-	// case <-pingerDone:
-	//		break
+	case err := <-serverErrors:
+		log.Fatalf("error: starting server: %s", err)
 	case <-sigs:
-		break
+		server.Close()
+		return
 	}
 
 	// fmt.Println(pinger.Result())

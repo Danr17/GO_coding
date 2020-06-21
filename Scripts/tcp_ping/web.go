@@ -63,14 +63,12 @@ pingLoop:
 	for {
 		select {
 		case <-t.C:
-			duration, remoteAddr, err := site.ping()
+			duration, _, err := site.ping()
 			site.result.Counter++
 
 			if err != nil {
-				fmt.Printf("Ping %s - failed: %s\n", site.target, err)
+				break
 			} else {
-				fmt.Printf("Ping %s(%s) - Connected - time=%s\n", site.target, remoteAddr, duration)
-
 				if site.result.Counter == 1 {
 					site.result.MinDuration = duration
 					site.result.MaxDuration = duration
