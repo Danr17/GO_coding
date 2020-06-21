@@ -9,8 +9,9 @@ import (
 
 // Target is a ping
 type Target struct {
-	Host string
-	Port int
+	Host     string
+	HostName string
+	Port     int
 
 	Counter  int
 	Interval time.Duration

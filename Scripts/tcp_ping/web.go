@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -85,11 +85,11 @@ pingLoop:
 				site.Result.TotalDuration += duration
 			}
 			if site.Result.Counter >= site.Target.Counter && site.Target.Counter != 0 {
-				log.Printf("site %s and counter %d", site.Target.Host, site.Result.Counter)
+				//log.Printf("site %s and counter %d", site.Target.Host, site.Result.Counter)
 				site.Result.Counter = 0
 				site.Result.Status = true
 				hour, min, sec := time.Now().Local().Clock()
-				site.Result.LastSeen = string(hour) + string(min) + string(sec)
+				site.Result.LastSeen = strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
 				break pingLoop
 			}
 		}

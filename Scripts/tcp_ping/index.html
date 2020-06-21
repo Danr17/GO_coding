@@ -8,12 +8,11 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="https://storage.googleapis.com/dans-static/style.css">
 
     <title>Item Collection</title>
   </head>
 
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-dark" style="background-color: #C0C0C0;">
       <div class="container-fluid">
         <div class="navbar-header">
           <a class="navbar-brand" href="/">
@@ -34,7 +33,7 @@
                         <th scope="col">Host</th>
                         <th scope="col">IP</th>
                         <th scope="col">Status</th>
-                        <th scope="col">Last Online</th>
+                        <th scope="col">Last Reachable</th>
                         <th scope="col">Min</th>
                         <th scope="col">Max</th>
                         <th scope="col">Avg</th>
@@ -44,9 +43,13 @@
                       {{range $i, $a := .Items}}
                       <tr>
                         <th scope="row">{{$i}}</th>
+                        <td style="text-align: left">{{$a.Target.HostName}}</td>
                         <td style="text-align: left">{{$a.Target.Host}}</td>
-                        <td style="text-align: left">{{$a.Target.Host}}</td>
-                        <td style="text-align: left">{{$a.Result.Status}}</td>
+                        {{if $a.Result.Status}}
+                        <td style="text-align: left" class="text-success">ONLINE</td>
+                        {{else}}
+                        <td style="text-align: left" class="text-danger">DOWN</td>
+                        {{end}}
                         <td style="text-align: left">{{$a.Result.LastSeen}}</td>
                         <td style="text-align: left">{{$a.Result.MinDuration}}</td>
                         <td style="text-align: left">{{$a.Result.MaxDuration}}</td>

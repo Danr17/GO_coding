@@ -74,12 +74,6 @@ func main() {
 		pinger.SetTarget(&target)
 		pinger.Start()
 		<-pinger.done
-		// select {
-		// case <-pingerDone:
-		// 	break
-		// case <-sigs:
-		// 	break
-		// }
 
 		fmt.Println(pinger.Result())
 		return
@@ -98,6 +92,7 @@ Example usage: tcp_ping web=true file="filename" port=443`)
 			Timeout:  timeoutDuration,
 			Interval: intervalDuration,
 			Host:     host.ip,
+			HostName: host.name,
 			Port:     *port,
 			Counter:  *counter,
 		}
