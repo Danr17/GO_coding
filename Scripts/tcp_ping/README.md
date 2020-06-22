@@ -1,28 +1,28 @@
-#Web TCP Ping & ClI TCP Ping.
+# Web TCP Ping & ClI TCP Ping.
 
-##Download your version
+## Download your version
 
-###Linux
+### Linux
 tcp_ping-linux-386        
 tcp_ping-linux-amd64  
 
-###Mac
+### Mac
 tcp_ping-darwin-386
 tcp_ping-darwin-amd64
 
-###Windows
+### Windows
 tcp_ping-windows-386
 tcp_ping-windows-amd64
 
-##Run the tcp_ping script 
+## Run the tcp_ping script 
 
-###WEB:
+### WEB:
 1. Web Ping with defauts (defaults: port=443, interval=1s, counter=4)
     > ./tcp_ping-linux-amd64 -web -file=example.txt
 2. Web Ping with over port=80, interval=3s, counter=10
     > ./tcp_ping-linux-amd64 -web -file=example.txt -port 80 -interval 3s -counter 10
 
-###CLI:
+### CLI:
 1. ping over tcp  with defaults (defaults: port=443, interval=1s, counter=4)
     > ./tcp_ping-linux-amd64 example.com
 2. ping over tcp over custom port
@@ -30,9 +30,9 @@ tcp_ping-windows-amd64
 3. ping over tcp using counter and interval
     > ./tcp_ping-linux-amd64 -port 80 -counter 3 -interval 3s example.com
 
-##Example
+## Example
 
-###Web
+### Web
 
 ```bash
 ./tcp_ping -web -file=example.txt
@@ -41,7 +41,7 @@ tcp_ping-windows-amd64
 
 Open http://localhost:8080 in your browser. 
 
-###CLI
+### CLI
 
 ```bash
 ./tcp_ping --counter 10 example.com
