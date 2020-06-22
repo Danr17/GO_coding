@@ -1,18 +1,22 @@
 # Web TCP Ping & ClI TCP Ping.
 
 ## Download your version
+In the archive you should find:
+* an executable (like tcp_ping-linux-386)
+* index.html **Should be in the same folder with the executable, otherwise the program will crash**
+* an example.txt file that can be modified for your needs
 
 ### Linux
-tcp_ping-linux-386        
-tcp_ping-linux-amd64  
+tcp_ping-linux-386.tar.gz       
+tcp_ping-linux-amd64.tar.gz  
 
 ### Mac
-tcp_ping-darwin-386
-tcp_ping-darwin-amd64
+tcp_ping-darwin-386.tar.gz
+tcp_ping-darwin-amd64.tar.gz
 
 ### Windows
-tcp_ping-windows-386
-tcp_ping-windows-amd64
+tcp_ping-windows-386.tar.gz
+tcp_ping-windows-amd64.tar.gz
 
 ## Run the tcp_ping script 
 

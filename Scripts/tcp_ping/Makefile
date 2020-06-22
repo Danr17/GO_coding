@@ -24,4 +24,22 @@ build_all:
 clean:
 	find ${ROOT_DIR} -name '${BINARY}[-?][a-zA-Z0-9]*[-?][a-zA-Z0-9]*' -delete
 
+tar:
+	mv tcp_ping-windows-386 tcp_ping-windows-386.exe
+	mv tcp_ping-windows-amd64 tcp_ping-windows-amd64.exe
+	tar -czvf tcp_ping-windows-386.tar.gz tcp_ping-windows-386.exe index.html example.txt
+	tar -czvf tcp_ping-windows-amd64.tar.gz tcp_ping-windows-amd64.exe index.html example.txt
+	tar -czvf tcp_ping-darwin-386.tar.gz tcp_ping-darwin-386 index.html example.txt
+	tar -czvf tcp_ping-darwin-amd64.tar.gz tcp_ping-darwin-amd64 index.html example.txt
+	tar -czvf tcp_ping-linux-386.tar.gz tcp_ping-linux-386 index.html example.txt
+	tar -czvf tcp_ping-linux-amd64.tar.gz tcp_ping-linux-amd64 index.html example.txt
+	
+tar_clean:
+	rm -rf tcp_ping-windows-386.tar.gz 
+	rm -rf tcp_ping-windows-amd64.tar.gz 
+	rm -rf tcp_ping-darwin-386.tar.gz  
+	rm -rf tcp_ping-darwin-amd64.tar.gz 
+	rm -rf tcp_ping-linux-386.tar.gz
+	rm -rf tcp_ping-linux-amd64.tar.gz 
+
 .PHONY: check clean build_all all
