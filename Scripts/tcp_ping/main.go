@@ -11,14 +11,20 @@ import (
 	"time"
 )
 
-const usage = `1. ping over tcp
-    > tcp_ping-linux-amd64 google.com
-2. ping over tcp with custom port
-    > tcp_ping-linux-amd64 google.com -port=443
+const usage = `WEB:
+1. Web Ping with defauts (defaults: port=443, interval=1s, counter=4)
+    > tcp_ping-linux-amd64 -web -file=example.txt
+2. Web Ping with over port=80, interval=3s, counter=10
+    > tcp_ping-linux-amd64 -web -file=example.txt -port 80 -interval 3s -counter 10
+
+CLI:
+1. ping over tcp  with defaults (defaults: port=443, interval=1s, counter=4)
+    > tcp_ping-linux-amd64 example.com
+2. ping over tcp over custom port
+    > tcp_ping-linux-amd64 -port 22 example.com 
 3. ping over tcp using counter and interval
-    > tcp_ping-linux-amd64 google.com -counter=10 -interval="3s"
-4. Web Ping over provided sources
-    > tcp_ping-linux-amd64 -web -file=example.txt`
+    > tcp_ping-linux-amd64 -port 80 -counter 3 -interval 3s example.com
+`
 
 var (
 	isWeb     = flag.Bool("web", false, "enable this if you want to see it on Web")
@@ -81,8 +87,7 @@ func main() {
 		return
 	}
 	if *inWebFile == "" {
-		fmt.Println(`The filename should be specified (port is 443 default if not changed):
-Example usage: tcp_ping web=true file="filename" port=443`)
+		fmt.Println(usage)
 	}
 	hosts, err := parse(*inWebFile)
 	if err != nil {
