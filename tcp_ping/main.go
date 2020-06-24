@@ -9,6 +9,11 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	parse "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/parsefile"
+	tcping "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/tcp_ping"
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/utils"
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/web"
 )
 
 const usage = `WEB:
@@ -52,11 +57,11 @@ func main() {
 		close(done)
 	}()
 
-	timeoutDuration, err := convertTime(*timeout)
+	timeoutDuration, err := utils.ConvertTime(*timeout)
 	if err != nil {
 		log.Fatalln("The value provided for **timeout** is wrong")
 	}
-	intervalDuration, err := convertTime(*interval)
+	intervalDuration, err := utils.ConvertTime(*interval)
 	if err != nil {
 		log.Fatalln("The value provided for **interval** is wrong")
 	}
@@ -68,9 +73,9 @@ func main() {
 		}
 
 		host := args[0]
-		parseHost := FormatIP(host)
+		parseHost := utils.FormatIP(host)
 
-		target := Target{
+		target := ping.Target{
 			Timeout:  timeoutDuration,
 			Interval: intervalDuration,
 			Host:     parseHost,
@@ -78,7 +83,7 @@ func main() {
 			Counter:  *counter,
 		}
 
-		pinger := NewTCPing()
+		pinger := tcping.NewTCPing()
 		pinger.SetTarget(&target)
 		pinger.Start()
 		<-pinger.done
@@ -89,13 +94,13 @@ func main() {
 	if *inWebFile == "" {
 		fmt.Println(usage)
 	}
-	hosts, err := parse(*inWebFile)
+	hosts, err := parse.File(*inWebFile)
 	if err != nil {
 		log.Fatalf("could parse the file %s: %v", *inWebFile, err)
 	}
-	targets := []*Target{}
+	targets := []*ping.Target{}
 	for _, host := range hosts {
-		webtarget := Target{
+		webtarget := ping.Target{
 			Timeout:  timeoutDuration,
 			Interval: intervalDuration,
 			Host:     host.ip,
@@ -106,10 +111,10 @@ func main() {
 		targets = append(targets, &webtarget)
 	}
 
-	pinger := NewWebPing(targets)
+	pinger := web.NewWebPing(targets)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", htmlPage(pinger))
+	mux.HandleFunc("/", web.HTMLPage(pinger))
 
 	server := http.Server{
 		Addr:         "localhost:8080",
