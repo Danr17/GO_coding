@@ -14,7 +14,7 @@ import (
 	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/ping"
 	tcping "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/tcp_ping"
 	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/utils"
-	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/web"
+	webping "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/web_ping"
 )
 
 const usage = `WEB:
@@ -35,10 +35,20 @@ CLI:
 var (
 	isWeb     = flag.Bool("web", false, "enable this if you want to see it on Web")
 	inWebFile = flag.String("file", "", "specify the filename")
+	prot      = flag.String("p", "tcp", "enable this if you want to see it on Web")
 	port      = flag.Int("port", 443, "enable this if you want to see it on Web")
 	counter   = flag.Int("counter", 4, "ping counter")
 	timeout   = flag.String("timeout", "1s", `connect timeout, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
 	interval  = flag.String("interval", "1s", `ping interval, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
+)
+
+type Protocol int
+
+const (
+	tcp Protocol = iota
+	udp
+	icmp
+	web
 )
 
 func main() {
@@ -49,8 +59,6 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	//notify web to stop
 	done := make(chan struct{}, 1)
-	//channel to listen for errors coming from the listener.
-	serverErrors := make(chan error, 1)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
@@ -68,62 +76,17 @@ func main() {
 	}
 
 	if !*isWeb {
-		if len(args) < 1 {
-			fmt.Println(usage)
-			os.Exit(1)
-		}
-
-		host := args[0]
-		parseHost := utils.FormatIP(host)
-
-		target := ping.Target{
-			Timeout:  timeoutDuration,
-			Interval: intervalDuration,
-			Host:     parseHost,
-			Port:     *port,
-			Counter:  *counter,
-		}
-
-		pinger := tcping.NewTCPing()
-		pinger.SetTarget(&target)
-		pinger.Start()
-		<-pinger.Done
-
-		fmt.Println(pinger.Result())
+		startTCP(args, timeoutDuration, intervalDuration)
 		return
 	}
 	if *inWebFile == "" {
 		fmt.Println(usage)
 	}
-	hosts, err := parse.File(*inWebFile)
-	if err != nil {
-		log.Fatalf("could parse the file %s: %v", *inWebFile, err)
-	}
-	targets := []*ping.Target{}
-	for _, host := range hosts {
-		webtarget := ping.Target{
-			Timeout:  timeoutDuration,
-			Interval: intervalDuration,
-			Host:     host.IP,
-			HostName: host.Name,
-			Port:     *port,
-			Counter:  *counter,
-		}
-		targets = append(targets, &webtarget)
-	}
 
-	pinger := web.NewWebPing(targets)
+	server, pinger := startWeb(args, timeoutDuration, intervalDuration)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", web.HTMLPage(pinger))
-
-	server := http.Server{
-		Addr:         "localhost:8080",
-		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
-	}
+	//channel to listen for errors coming from the listener.
+	serverErrors := make(chan error, 1)
 
 	go func() {
 		log.Println("API listening on port 8080. Open browser: http://localhost:8080")
@@ -142,4 +105,63 @@ func main() {
 
 	// fmt.Println(pinger.Result())
 	return
+}
+
+func startTCP(args []string, timeoutDuration time.Duration, intervalDuration time.Duration) {
+	if len(args) < 1 {
+		fmt.Println(usage)
+		os.Exit(1)
+	}
+
+	host := args[0]
+	parseHost := utils.FormatIP(host)
+
+	target := ping.Target{
+		Timeout:  timeoutDuration,
+		Interval: intervalDuration,
+		Host:     parseHost,
+		Port:     *port,
+		Counter:  *counter,
+	}
+
+	pinger := tcping.NewTCPing()
+	pinger.SetTarget(&target)
+	pinger.Start()
+	<-pinger.Done
+
+	fmt.Println(pinger.Result())
+}
+
+func startWeb(args []string, timeoutDuration time.Duration, intervalDuration time.Duration) (server *http.Server, pinger *webping.WebPing) {
+	hosts, err := parse.File(*inWebFile)
+	if err != nil {
+		log.Fatalf("could parse the file %s: %v", *inWebFile, err)
+	}
+	targets := []*ping.Target{}
+	for _, host := range hosts {
+		webtarget := ping.Target{
+			Timeout:  timeoutDuration,
+			Interval: intervalDuration,
+			Host:     host.IP,
+			HostName: host.Name,
+			Port:     *port,
+			Counter:  *counter,
+		}
+		targets = append(targets, &webtarget)
+	}
+
+	pinger = webping.NewWebPing(targets)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", webping.HTMLPage(pinger))
+
+	server = &http.Server{
+		Addr:         "localhost:8080",
+		Handler:      mux,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+	return server, pinger
+
 }
