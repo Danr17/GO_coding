@@ -10,11 +10,11 @@ import (
 
 //Host holds host informations
 type Host struct {
-	name string
-	ip   string
+	Name string
+	IP   string
 }
 
-//ParseFile parse the provided txt file
+//File parse the provided txt file
 func File(filename string) ([]Host, error) {
 	hosts := []Host{}
 	f, err := os.Open(filename)
@@ -34,7 +34,7 @@ func File(filename string) ([]Host, error) {
 		result := strings.Split(line, " ")
 		host := strings.TrimSpace(result[0])
 		ip := strings.TrimSpace(result[1])
-		hosts = append(hosts, Host{name: host, ip: ip})
+		hosts = append(hosts, Host{Name: host, IP: ip})
 	}
 	return hosts, nil
 }

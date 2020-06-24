@@ -6,11 +6,14 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/ping"
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/utils"
 )
 
 type website struct {
-	Target *Target
-	Result *Result
+	Target *ping.Target
+	Result *ping.Result
 }
 
 //WebPing data
@@ -19,14 +22,14 @@ type WebPing struct {
 }
 
 // NewWebPing return a new WebPing
-func NewWebPing(targets []*Target) *WebPing {
+func NewWebPing(targets []*ping.Target) *WebPing {
 	sites := []*website{}
 	for _, target := range targets {
 		site := website{
 			Target: target,
 		}
 		if site.Result == nil {
-			site.Result = &Result{Target: target}
+			site.Result = &ping.Result{Target: target}
 		}
 		sites = append(sites, &site)
 	}
@@ -98,7 +101,7 @@ pingLoop:
 
 func (site *website) ping() (time.Duration, net.Addr, error) {
 	var remoteAddr net.Addr
-	duration, errIfce := timeIt(func() interface{} {
+	duration, errIfce := utils.TimeIt(func() interface{} {
 		conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", site.Target.Host, site.Target.Port), site.Target.Timeout)
 		if err != nil {
 			return err

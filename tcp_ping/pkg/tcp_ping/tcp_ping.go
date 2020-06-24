@@ -5,33 +5,36 @@ import (
 	"log"
 	"net"
 	"time"
+
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/ping"
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/utils"
 )
 
 // TCPing ...
 type TCPing struct {
-	target *Target
-	done   chan struct{}
-	result *Result
+	target *ping.Target
+	Done   chan struct{}
+	result *ping.Result
 }
 
 // NewTCPing return a new TCPing
 func NewTCPing() *TCPing {
 	tcping := TCPing{
-		done: make(chan struct{}),
+		Done: make(chan struct{}),
 	}
 	return &tcping
 }
 
 // SetTarget set target for TCPing
-func (tcping *TCPing) SetTarget(target *Target) {
+func (tcping *TCPing) SetTarget(target *ping.Target) {
 	tcping.target = target
 	if tcping.result == nil {
-		tcping.result = &Result{Target: target}
+		tcping.result = &ping.Result{Target: target}
 	}
 }
 
 // Result return the result
-func (tcping TCPing) Result() *Result {
+func (tcping TCPing) Result() *ping.Result {
 	return tcping.result
 }
 
@@ -78,12 +81,12 @@ func (tcping TCPing) Start() {
 
 // Stop the tcping
 func (tcping *TCPing) Stop() {
-	tcping.done <- struct{}{}
+	tcping.Done <- struct{}{}
 }
 
 func (tcping TCPing) ping() (time.Duration, net.Addr, error) {
 	var remoteAddr net.Addr
-	duration, errIfce := timeIt(func() interface{} {
+	duration, errIfce := utils.TimeIt(func() interface{} {
 		conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", tcping.target.Host, tcping.target.Port), tcping.target.Timeout)
 		if err != nil {
 			return err

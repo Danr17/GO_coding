@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-func timeIt(f func() interface{}) (int64, interface{}) {
+//TimeIt a wrapper around function t measure the time it took to execute
+func TimeIt(f func() interface{}) (int64, interface{}) {
 	startAt := time.Now()
 	res := f()
 	endAt := time.Now()

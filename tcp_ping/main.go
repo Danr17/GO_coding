@@ -87,7 +87,7 @@ func main() {
 		pinger := tcping.NewTCPing()
 		pinger.SetTarget(&target)
 		pinger.Start()
-		<-pinger.done
+		<-pinger.Done
 
 		fmt.Println(pinger.Result())
 		return
@@ -104,8 +104,8 @@ func main() {
 		webtarget := ping.Target{
 			Timeout:  timeoutDuration,
 			Interval: intervalDuration,
-			Host:     host.ip,
-			HostName: host.name,
+			Host:     host.IP,
+			HostName: host.Name,
 			Port:     *port,
 			Counter:  *counter,
 		}
