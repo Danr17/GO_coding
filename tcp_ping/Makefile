@@ -18,28 +18,30 @@ build:
 
 build_all:
 	$(foreach GOOS, $(PLATFORMS),\
-	$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); go build -v -o $(BINARY)-$(GOOS)-$(GOARCH))))
+	$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); go build -v -o releases/$(BINARY)-$(GOOS)-$(GOARCH))))
 
 # Remove only what we've created
 clean:
-	find ${ROOT_DIR} -name '${BINARY}[-?][a-zA-Z0-9]*[-?][a-zA-Z0-9]*' -delete
+	find ${ROOT_DIR}/releases/ -name '${BINARY}[-?][a-zA-Z0-9]*[-?][a-zA-Z0-9]*' -delete
 
 tar:
-	mv tcp_ping-windows-386 tcp_ping-windows-386.exe
-	mv tcp_ping-windows-amd64 tcp_ping-windows-amd64.exe
-	tar -czvf tcp_ping-windows-386.tar.gz tcp_ping-windows-386.exe index.html example.txt
-	tar -czvf tcp_ping-windows-amd64.tar.gz tcp_ping-windows-amd64.exe index.html example.txt
-	tar -czvf tcp_ping-darwin-386.tar.gz tcp_ping-darwin-386 index.html example.txt
-	tar -czvf tcp_ping-darwin-amd64.tar.gz tcp_ping-darwin-amd64 index.html example.txt
-	tar -czvf tcp_ping-linux-386.tar.gz tcp_ping-linux-386 index.html example.txt
-	tar -czvf tcp_ping-linux-amd64.tar.gz tcp_ping-linux-amd64 index.html example.txt
+	mv releases/tcp_ping-windows-386 releases/tcp_ping-windows-386.exe
+	mv releases/tcp_ping-windows-amd64 releases/tcp_ping-windows-amd64.exe
+	cp index.html releases/index.html
+	cp example.txt releases/example.txt
+	tar -czvf releases/tcp_ping-windows-386.tar.gz releases/tcp_ping-windows-386.exe releases/index.html releases/example.txt
+	tar -czvf releases/tcp_ping-windows-amd64.tar.gz releases/tcp_ping-windows-amd64.exe releases/index.html releases/example.txt
+	tar -czvf releases/tcp_ping-darwin-386.tar.gz releases/tcp_ping-darwin-386 releases/index.html releases/example.txt
+	tar -czvf releases/tcp_ping-darwin-amd64.tar.gz releases/tcp_ping-darwin-amd64 releases/index.html releases/example.txt
+	tar -czvf releases/tcp_ping-linux-386.tar.gz releases/tcp_ping-linux-386 releases/index.html releases/example.txt
+	tar -czvf releases/tcp_ping-linux-amd64.tar.gz releases/tcp_ping-linux-amd64 releases/index.html releases/example.txt
 	
 tar_clean:
-	rm -rf tcp_ping-windows-386.tar.gz 
-	rm -rf tcp_ping-windows-amd64.tar.gz 
-	rm -rf tcp_ping-darwin-386.tar.gz  
-	rm -rf tcp_ping-darwin-amd64.tar.gz 
-	rm -rf tcp_ping-linux-386.tar.gz
-	rm -rf tcp_ping-linux-amd64.tar.gz 
+	rm -rf releases/tcp_ping-windows-386.tar.gz 
+	rm -rf releases/tcp_ping-windows-amd64.tar.gz 
+	rm -rf releases/tcp_ping-darwin-386.tar.gz  
+	rm -rf releases/tcp_ping-darwin-amd64.tar.gz 
+	rm -rf releases/tcp_ping-linux-386.tar.gz
+	rm -rf releases/tcp_ping-linux-amd64.tar.gz 
 
 .PHONY: check clean build_all all
