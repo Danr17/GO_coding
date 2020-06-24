@@ -11,6 +11,7 @@ import (
 	"time"
 
 	parse "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/parsefile"
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/ping"
 	tcping "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/tcp_ping"
 	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/utils"
 	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/web"
