@@ -1,6 +1,7 @@
 package webping
 
 import (
+	"log"
 	"net/http"
 	"sync"
 	"text/template"
@@ -22,6 +23,9 @@ func HTMLPage(pinger *WebPing) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		init.Do(func() {
 			tmpl, err = template.ParseFiles("index.html")
+			if err != nil {
+				log.Fatalln("Couldn't parse the index.html file")
+			}
 		})
 
 		retrieve := pinger.sites

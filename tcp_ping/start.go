@@ -51,8 +51,8 @@ func startWeb(args []string, timeoutDuration time.Duration, intervalDuration tim
 			Interval: intervalDuration,
 			Host:     host.IP,
 			HostName: host.Name,
-			Port:     *port,
-			Proto:    *proto,
+			Port:     host.Port,
+			Proto:    host.Protocol,
 			Counter:  *counter,
 		}
 		targets = append(targets, &webtarget)

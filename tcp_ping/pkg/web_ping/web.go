@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	icmpPing "github.com/sparrc/go-ping"
+
 	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/ping"
 	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/utils"
 )
@@ -49,7 +51,11 @@ startLoop:
 		default:
 			wg.Add(len(webping.sites))
 			for _, site := range webping.sites {
-				go pingHost(site, &wg)
+				if site.Target.Proto == "icmp" {
+					go pingIcmp(site, &wg)
+				} else {
+					go pingHost(site, &wg)
+				}
 			}
 			wg.Wait()
 
@@ -96,6 +102,26 @@ pingLoop:
 				break pingLoop
 			}
 		}
+	}
+}
+
+func pingIcmp(site *website, wg *sync.WaitGroup) {
+	defer wg.Done()
+	pinger, err := icmpPing.NewPinger(site.Target.Host)
+	if err != nil {
+		panic(err)
+	}
+	pinger.Count = site.Target.Counter
+	pinger.Interval = site.Target.Interval
+	pinger.Run() // blocks until finished
+	stats := pinger.Statistics()
+	hour, min, sec := time.Now().Local().Clock()
+	site.Result.LastSeen = strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
+	site.Result.MinDuration = stats.MinRtt
+	site.Result.MaxDuration = stats.MaxRtt
+	site.Result.Status = true
+	if stats.PacketLoss > 0 {
+		site.Result.Status = false
 	}
 }
 
