@@ -34,6 +34,7 @@ func startCLI(pinger *cliping.CLIping, args []string, timeoutDuration time.Durat
 
 	pinger.SetTarget(&target)
 	pinger.Start()
+	<-pinger.Done
 	fmt.Println(pinger.Result())
 
 }
