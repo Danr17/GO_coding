@@ -4,12 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	cliping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/cli_ping"
 	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/utils"
+	webping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/web_ping"
 )
 
 const usage = `WEB:
@@ -58,10 +60,6 @@ func main() {
 	serverErrors := make(chan error, 1)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-sigs
-		close(done)
-	}()
 
 	timeoutDuration, err := utils.ConvertTime(*timeout)
 	if err != nil {
@@ -72,13 +70,14 @@ func main() {
 		log.Fatalln("The value provided for **interval** is wrong")
 	}
 
+	var server *http.Server
+	var WEBpinger *webping.WebPing
+	var CLIpinger *cliping.CLIping
+
 	switch *proto {
 	case "tcp", "udp":
-		startCLI(args, timeoutDuration, intervalDuration)
-		select {
-		case <-sigs:
-			return
-		}
+		CLIpinger = cliping.NewCLIping()
+		startCLI(CLIpinger, args, timeoutDuration, intervalDuration)
 	case "icmp":
 		cliping.StartICMP(args, *counter, intervalDuration, timeoutDuration)
 
@@ -87,24 +86,31 @@ func main() {
 			fmt.Println(usage)
 		}
 
-		server, pinger := startWeb(args, timeoutDuration, intervalDuration)
+		server, WEBpinger = startWeb(args, timeoutDuration, intervalDuration)
 
 		go func() {
 			log.Println("API listening on port 8080. Open browser: http://localhost:8080")
 			serverErrors <- server.ListenAndServe()
 		}()
 
-		go pinger.Start(done)
-		select {
-		case err := <-serverErrors:
-			log.Fatalf("error: starting server: %s", err)
-		case <-sigs:
-			server.Close()
-			return
-		}
+		go WEBpinger.Start(done)
 	default:
 		log.Panicln("The value provided for protocol is not valid, should be --p web, --p tcp, --p udp or --p icmp")
 
 	}
 
+	go func() {
+		select {
+		case err := <-serverErrors:
+			log.Fatalf("error: starting server: %s", err)
+		case <-sigs:
+			if *proto == "web" {
+				server.Close()
+				return
+			}
+			CLIpinger.Stop()
+			return
+
+		}
+	}()
 }

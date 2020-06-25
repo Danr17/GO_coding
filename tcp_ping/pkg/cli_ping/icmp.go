@@ -22,7 +22,7 @@ func StartICMP(args []string, count int, timeoutDuration time.Duration, interval
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
-		for _ = range c {
+		for range c {
 			pinger.Stop()
 		}
 	}()

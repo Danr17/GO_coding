@@ -13,14 +13,14 @@ import (
 // CLIping ...
 type CLIping struct {
 	target *ping.Target
-	Done   chan struct{}
+	Done   chan bool
 	result *ping.Result
 }
 
 // NewCLIping return a new TCPing
 func NewCLIping() *CLIping {
 	cliping := CLIping{
-		Done: make(chan struct{}),
+		Done: make(chan bool),
 	}
 	return &cliping
 }
@@ -45,6 +45,8 @@ func (cliping CLIping) Start() {
 		defer t.Stop()
 		for {
 			select {
+			case <-cliping.Done:
+				return
 			case <-t.C:
 				duration, remoteAddr, err := cliping.ping()
 				cliping.result.Counter++
@@ -81,7 +83,7 @@ func (cliping CLIping) Start() {
 
 // Stop the tcping
 func (cliping *CLIping) Stop() {
-	cliping.Done <- struct{}{}
+	close(cliping.Done)
 }
 
 func (cliping CLIping) ping() (time.Duration, net.Addr, error) {
