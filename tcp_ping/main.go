@@ -77,8 +77,8 @@ func main() {
 	}
 
 	switch *proto {
-	case "tcp":
-		startTCP(args, timeoutDuration, intervalDuration)
+	case "tcp", "udp", "icmp":
+		startCLI(args, timeoutDuration, intervalDuration)
 		select {
 		case <-sigs:
 			return
@@ -110,7 +110,7 @@ func main() {
 
 }
 
-func startTCP(args []string, timeoutDuration time.Duration, intervalDuration time.Duration) {
+func startCLI(args []string, timeoutDuration time.Duration, intervalDuration time.Duration) {
 	if len(args) < 1 {
 		fmt.Println(usage)
 		os.Exit(1)
@@ -124,6 +124,7 @@ func startTCP(args []string, timeoutDuration time.Duration, intervalDuration tim
 		Interval: intervalDuration,
 		Host:     parseHost,
 		Port:     *port,
+		Proto:    *proto,
 		Counter:  *counter,
 	}
 
@@ -148,6 +149,7 @@ func startWeb(args []string, timeoutDuration time.Duration, intervalDuration tim
 			Host:     host.IP,
 			HostName: host.Name,
 			Port:     *port,
+			Proto:    *proto,
 			Counter:  *counter,
 		}
 		targets = append(targets, &webtarget)
