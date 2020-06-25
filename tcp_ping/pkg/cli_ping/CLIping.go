@@ -112,18 +112,8 @@ func (cliping CLIping) ping() (time.Duration, net.Addr, error) {
 			conn.Close()
 			return nil
 		})
-	case "icmp":
-		duration, errIfce = utils.TimeIt(func() interface{} {
-			conn, err := net.DialTimeout("ipv4:icmp", fmt.Sprintf("%s:%d", cliping.target.Host, cliping.target.Port), cliping.target.Timeout)
-			if err != nil {
-				return err
-			}
-			remoteAddr = conn.RemoteAddr()
-			conn.Close()
-			return nil
-		})
 	default:
-		log.Panicln("wrong protocol")
+		log.Panicln("The value provided for protocol is not valid, should be --p web, --p tcp, --p udp or --p icmp")
 	}
 	if errIfce != nil {
 		err := errIfce.(error)
