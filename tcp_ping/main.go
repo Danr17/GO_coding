@@ -10,11 +10,11 @@ import (
 	"syscall"
 	"time"
 
-	parse "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/parsefile"
-	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/ping"
-	tcping "github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/tcp_ping"
-	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/utils"
-	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/web"
+	cliping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/cli_ping"
+	parse "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/parsefile"
+	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/ping"
+	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/utils"
+	webping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/web_ping"
 )
 
 const usage = `WEB:
@@ -33,12 +33,21 @@ CLI:
 `
 
 var (
-	isWeb     = flag.Bool("web", false, "enable this if you want to see it on Web")
-	inWebFile = flag.String("file", "", "specify the filename")
+	proto     = flag.String("p", "tcp", "enable this if you want to see it on Web")
 	port      = flag.Int("port", 443, "enable this if you want to see it on Web")
+	inWebFile = flag.String("file", "", "specify the filename")
 	counter   = flag.Int("counter", 4, "ping counter")
 	timeout   = flag.String("timeout", "1s", `connect timeout, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
 	interval  = flag.String("interval", "1s", `ping interval, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
+)
+
+type Protocol int
+
+const (
+	tcp Protocol = iota
+	udp
+	icmp
+	web
 )
 
 func main() {
@@ -67,34 +76,66 @@ func main() {
 		log.Fatalln("The value provided for **interval** is wrong")
 	}
 
-	if !*isWeb {
-		if len(args) < 1 {
+	switch *proto {
+	case "tcp":
+		startTCP(args, timeoutDuration, intervalDuration)
+		select {
+		case <-sigs:
+			return
+		}
+	case "web":
+		if *inWebFile == "" {
 			fmt.Println(usage)
-			os.Exit(1)
 		}
 
-		host := args[0]
-		parseHost := utils.FormatIP(host)
+		server, pinger := startWeb(args, timeoutDuration, intervalDuration)
 
-		target := ping.Target{
-			Timeout:  timeoutDuration,
-			Interval: intervalDuration,
-			Host:     parseHost,
-			Port:     *port,
-			Counter:  *counter,
+		go func() {
+			log.Println("API listening on port 8080. Open browser: http://localhost:8080")
+			serverErrors <- server.ListenAndServe()
+		}()
+
+		go pinger.Start(done)
+		select {
+		case err := <-serverErrors:
+			log.Fatalf("error: starting server: %s", err)
+		case <-sigs:
+			server.Close()
+			return
 		}
+	default:
+		log.Panicln("The value provided for protocol is not valid, should be --p web, --p tcp, --p udp or --p icmp")
 
-		pinger := tcping.NewTCPing()
-		pinger.SetTarget(&target)
-		pinger.Start()
-		<-pinger.Done
-
-		fmt.Println(pinger.Result())
-		return
 	}
-	if *inWebFile == "" {
+
+}
+
+func startTCP(args []string, timeoutDuration time.Duration, intervalDuration time.Duration) {
+	if len(args) < 1 {
 		fmt.Println(usage)
+		os.Exit(1)
 	}
+
+	host := args[0]
+	parseHost := utils.FormatIP(host)
+
+	target := ping.Target{
+		Timeout:  timeoutDuration,
+		Interval: intervalDuration,
+		Host:     parseHost,
+		Port:     *port,
+		Counter:  *counter,
+	}
+
+	pinger := cliping.NewCLIping()
+	pinger.SetTarget(&target)
+	pinger.Start()
+	<-pinger.Done
+
+	fmt.Println(pinger.Result())
+}
+
+func startWeb(args []string, timeoutDuration time.Duration, intervalDuration time.Duration) (server *http.Server, pinger *webping.WebPing) {
 	hosts, err := parse.File(*inWebFile)
 	if err != nil {
 		log.Fatalf("could parse the file %s: %v", *inWebFile, err)
@@ -112,34 +153,18 @@ func main() {
 		targets = append(targets, &webtarget)
 	}
 
-	pinger := web.NewWebPing(targets)
+	pinger = webping.NewWebPing(targets)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", web.HTMLPage(pinger))
+	mux.HandleFunc("/", webping.HTMLPage(pinger))
 
-	server := http.Server{
+	server = &http.Server{
 		Addr:         "localhost:8080",
 		Handler:      mux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
+	return server, pinger
 
-	go func() {
-		log.Println("API listening on port 8080. Open browser: http://localhost:8080")
-		serverErrors <- server.ListenAndServe()
-	}()
-
-	go pinger.Start(done)
-
-	select {
-	case err := <-serverErrors:
-		log.Fatalf("error: starting server: %s", err)
-	case <-sigs:
-		server.Close()
-		return
-	}
-
-	// fmt.Println(pinger.Result())
-	return
 }

@@ -1,4 +1,4 @@
-package web
+package webping
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/ping"
-	"github.com/Danr17/GO_scripts/tree/master/Scripts/tcp_ping/pkg/utils"
+	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/ping"
+	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/utils"
 )
 
 type website struct {
