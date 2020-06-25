@@ -86,18 +86,53 @@ func (cliping *CLIping) Stop() {
 
 func (cliping CLIping) ping() (time.Duration, net.Addr, error) {
 	var remoteAddr net.Addr
-	duration, errIfce := utils.TimeIt(func() interface{} {
-		conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", cliping.target.Host, cliping.target.Port), cliping.target.Timeout)
-		if err != nil {
-			return err
+	switch cliping.target.Proto {
+	case "tcp":
+		duration, errIfce := utils.TimeIt(func() interface{} {
+			conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", cliping.target.Host, cliping.target.Port), cliping.target.Timeout)
+			if err != nil {
+				return err
+			}
+			remoteAddr = conn.RemoteAddr()
+			conn.Close()
+			return nil
+		})
+		if errIfce != nil {
+			err := errIfce.(error)
+			return 0, remoteAddr, err
 		}
-		remoteAddr = conn.RemoteAddr()
-		conn.Close()
-		return nil
-	})
-	if errIfce != nil {
-		err := errIfce.(error)
-		return 0, remoteAddr, err
+		return time.Duration(duration), remoteAddr, nil
+	case "udp":
+		duration, errIfce := utils.TimeIt(func() interface{} {
+			conn, err := net.DialTimeout("udp", fmt.Sprintf("%s:%d", cliping.target.Host, cliping.target.Port), cliping.target.Timeout)
+			if err != nil {
+				return err
+			}
+			remoteAddr = conn.RemoteAddr()
+			conn.Close()
+			return nil
+		})
+		if errIfce != nil {
+			err := errIfce.(error)
+			return 0, remoteAddr, err
+		}
+		return time.Duration(duration), remoteAddr, nil
+	case "icmp":
+		duration, errIfce := utils.TimeIt(func() interface{} {
+			conn, err := net.DialTimeout("icmp", fmt.Sprintf("%s:%d", cliping.target.Host, cliping.target.Port), cliping.target.Timeout)
+			if err != nil {
+				return err
+			}
+			remoteAddr = conn.RemoteAddr()
+			conn.Close()
+			return nil
+		})
+		if errIfce != nil {
+			err := errIfce.(error)
+			return 0, remoteAddr, err
+		}
+		return time.Duration(duration), remoteAddr, nil
+
 	}
-	return time.Duration(duration), remoteAddr, nil
+	return 0, nil, nil
 }

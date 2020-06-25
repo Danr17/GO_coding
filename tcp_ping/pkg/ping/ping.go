@@ -11,6 +11,7 @@ import (
 type Target struct {
 	Host     string
 	HostName string
+	Proto    string
 	Port     int
 
 	Counter  int
