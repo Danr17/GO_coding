@@ -7,11 +7,11 @@ import (
 	"os"
 	"time"
 
-	cliping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/cli_ping"
-	parse "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/parsefile"
-	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/ping"
-	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/utils"
-	webping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/web_ping"
+	cliping "github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/cli_ping"
+	parse "github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/parsefile"
+	"github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/ping"
+	"github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/utils"
+	webping "github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/web_ping"
 )
 
 func startCLI(pinger *cliping.CLIping, args []string, timeoutDuration time.Duration, intervalDuration time.Duration) chan bool {

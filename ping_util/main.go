@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	cliping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/cli_ping"
-	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/utils"
-	webping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/web_ping"
+	cliping "github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/cli_ping"
+	"github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/utils"
+	webping "github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/web_ping"
 )
 
 const usage = `WEB:

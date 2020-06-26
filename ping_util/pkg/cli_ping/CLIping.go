@@ -6,8 +6,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/ping"
-	"github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/utils"
+	"github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/ping"
+	"github.com/Danr17/GO_scripts/tree/master/ping_util/pkg/utils"
 )
 
 // CLIping ...

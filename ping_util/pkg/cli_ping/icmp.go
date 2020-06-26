@@ -12,7 +12,6 @@ import (
 
 //StartICMP starts an icmp ping
 func StartICMP(args []string, count int, timeoutDuration time.Duration, intervalDuration time.Duration) chan bool {
-	fmt.Println(count, timeoutDuration, intervalDuration)
 	pinger, err := icmpPing.NewPinger(args[0])
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
