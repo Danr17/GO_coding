@@ -48,13 +48,14 @@ func startWeb(args []string, timeoutDuration time.Duration, intervalDuration tim
 	targets := []*ping.Target{}
 	for _, host := range hosts {
 		webtarget := ping.Target{
-			Timeout:  timeoutDuration,
-			Interval: intervalDuration,
-			Host:     host.IP,
-			HostName: host.Name,
-			Port:     host.Port,
-			Proto:    host.Protocol,
-			Counter:  *counter,
+			Timeout:    timeoutDuration,
+			Interval:   intervalDuration,
+			Host:       host.IP,
+			HostName:   host.Name,
+			Port:       host.Port,
+			Proto:      host.Protocol,
+			Counter:    *counter,
+			Privileged: *privileged,
 		}
 		targets = append(targets, &webtarget)
 	}

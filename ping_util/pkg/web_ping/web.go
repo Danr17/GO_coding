@@ -113,7 +113,11 @@ func pingIcmp(site *website, wg *sync.WaitGroup) {
 	}
 	pinger.Count = site.Target.Counter
 	pinger.Interval = site.Target.Interval
+
+	pinger.SetPrivileged(site.Target.Privileged)
+
 	pinger.Run() // blocks until finished
+
 	stats := pinger.Statistics()
 	hour, min, sec := time.Now().Local().Clock()
 	site.Result.LastSeen = strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)

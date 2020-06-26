@@ -14,9 +14,10 @@ type Target struct {
 	Proto    string
 	Port     int
 
-	Counter  int
-	Interval time.Duration
-	Timeout  time.Duration
+	Counter    int
+	Interval   time.Duration
+	Timeout    time.Duration
+	Privileged bool
 }
 
 func (target Target) String() string {

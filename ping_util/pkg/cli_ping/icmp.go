@@ -11,7 +11,7 @@ import (
 )
 
 //StartICMP starts an icmp ping
-func StartICMP(args []string, count int, timeoutDuration time.Duration, intervalDuration time.Duration) chan bool {
+func StartICMP(args []string, count int, timeoutDuration time.Duration, intervalDuration time.Duration, privileged bool) chan bool {
 	pinger, err := icmpPing.NewPinger(args[0])
 	if err != nil {
 		log.Fatalf("ERROR: %s\n", err.Error())
@@ -44,7 +44,8 @@ func StartICMP(args []string, count int, timeoutDuration time.Duration, interval
 	pinger.Count = count
 	pinger.Interval = intervalDuration
 	//pinger.Timeout = timeoutDuration
-	//pinger.SetPrivileged(*privileged)
+
+	pinger.SetPrivileged(privileged)
 
 	fmt.Printf("PING %s (%s):\n", pinger.Addr(), pinger.IPAddr())
 	pinger.Run()

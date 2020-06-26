@@ -1,3 +1,6 @@
-google.com 172.217.16.110
-yahoo.com 98.137.246.7
-dev-state.com 151.101.1.195
+google.com 172.217.16.110 tcp 443
+yahoo.com 98.137.246.7 icmp 0
+dev-state.com 151.101.1.195 udp 80
+example.com 93.184.216.34 icmp 0
+example.com 93.184.216.34 tcp 80
+example.com 93.184.216.34 udp 443

@@ -1,6 +1,6 @@
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-BINARY=tcp_ping
+BINARY=ping_util
 VERSION=0.1.1
 BUILD=`git rev-parse HEAD`
 PLATFORMS=darwin linux windows
@@ -25,23 +25,23 @@ clean:
 	find ${ROOT_DIR}/releases/ -name '${BINARY}[-?][a-zA-Z0-9]*[-?][a-zA-Z0-9]*' -delete
 
 tar:
-	mv releases/tcp_ping-windows-386 releases/tcp_ping-windows-386.exe
-	mv releases/tcp_ping-windows-amd64 releases/tcp_ping-windows-amd64.exe
+	mv releases/ping_util-windows-386 releases/ping_util-windows-386.exe
+	mv releases/ping_util-windows-amd64 releases/ping_util-windows-amd64.exe
 	cp index.html releases/index.html
 	cp example.txt releases/example.txt
-	tar -czvf releases/tcp_ping-windows-386.tar.gz releases/tcp_ping-windows-386.exe releases/index.html releases/example.txt
-	tar -czvf releases/tcp_ping-windows-amd64.tar.gz releases/tcp_ping-windows-amd64.exe releases/index.html releases/example.txt
-	tar -czvf releases/tcp_ping-darwin-386.tar.gz releases/tcp_ping-darwin-386 releases/index.html releases/example.txt
-	tar -czvf releases/tcp_ping-darwin-amd64.tar.gz releases/tcp_ping-darwin-amd64 releases/index.html releases/example.txt
-	tar -czvf releases/tcp_ping-linux-386.tar.gz releases/tcp_ping-linux-386 releases/index.html releases/example.txt
-	tar -czvf releases/tcp_ping-linux-amd64.tar.gz releases/tcp_ping-linux-amd64 releases/index.html releases/example.txt
+	tar -czvf releases/ping_util-windows-386.tar.gz releases/ping_util-windows-386.exe releases/index.html releases/example.txt
+	tar -czvf releases/ping_util-windows-amd64.tar.gz releases/ping_util-windows-amd64.exe releases/index.html releases/example.txt
+	tar -czvf releases/ping_util-darwin-386.tar.gz releases/ping_util-darwin-386 releases/index.html releases/example.txt
+	tar -czvf releases/ping_util-darwin-amd64.tar.gz releases/ping_util-darwin-amd64 releases/index.html releases/example.txt
+	tar -czvf releases/ping_util-linux-386.tar.gz releases/ping_util-linux-386 releases/index.html releases/example.txt
+	tar -czvf releases/ping_util-linux-amd64.tar.gz releases/ping_util-linux-amd64 releases/index.html releases/example.txt
 	
 tar_clean:
-	rm -rf releases/tcp_ping-windows-386.tar.gz 
-	rm -rf releases/tcp_ping-windows-amd64.tar.gz 
-	rm -rf releases/tcp_ping-darwin-386.tar.gz  
-	rm -rf releases/tcp_ping-darwin-amd64.tar.gz 
-	rm -rf releases/tcp_ping-linux-386.tar.gz
-	rm -rf releases/tcp_ping-linux-amd64.tar.gz 
+	rm -rf releases/ping_util-windows-386.tar.gz 
+	rm -rf releases/ping_util-windows-amd64.tar.gz 
+	rm -rf releases/ping_util-darwin-386.tar.gz  
+	rm -rf releases/ping_util-darwin-amd64.tar.gz 
+	rm -rf releases/ping_util-linux-386.tar.gz
+	rm -rf releases/ping_util-linux-amd64.tar.gz 
 
 .PHONY: check clean build_all all

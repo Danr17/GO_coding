@@ -16,36 +16,33 @@ import (
 
 const usage = `WEB:
 1. Web Ping with defauts (defaults: port=443, interval=1s, counter=4)
-    > tcp_ping-linux-amd64 -web -file=example.txt
-2. Web Ping with over port=80, interval=3s, counter=10
-    > tcp_ping-linux-amd64 -web -file=example.txt -port 80 -interval 3s -counter 10
+    > ping_util-linux-amd64 -p web -file example.txt
+2. Web Ping with count 10, interval 3s, timeout 3s
+    > ping_util-linux-amd64 -p web -file example.txt -c 10 -i 3s -t 3s
 
 CLI:
-1. ping over tcp  with defaults (defaults: port=443, interval=1s, counter=4)
-    > tcp_ping-linux-amd64 example.com
-2. ping over tcp over custom port
-    > tcp_ping-linux-amd64 -port 22 example.com 
-3. ping over tcp using counter and interval
-    > tcp_ping-linux-amd64 -port 80 -counter 3 -interval 3s example.com
+1. ping over TCP  with defaults (defaults: port=443, interval=1s, counter=4)
+    > ping_util-linux-amd64 example.com
+2. ping over TCP over with custom port, counter and interval
+    > ping_util-linux-amd64 -p tcp -port 80 -c 3 -i 3s example.com
+
+3. ping over UDP with defaults
+	> ping_util-linux-amd64 -p udp example.com
+
+4. ping over ICMP in Privilege (run as super-user) mode !!!
+	> sudo ./ping_util -p icmp -privileged example.com
+5. ping over ICMP without Privilege mode, is actually over UDP
+	> sudo ./ping_util -p icmp example.com 
 `
 
 var (
-	proto     = flag.String("p", "tcp", "enable this if you want to see it on Web")
-	port      = flag.Int("port", 443, "enable this if you want to see it on Web")
-	inWebFile = flag.String("file", "", "specify the filename")
-	counter   = flag.Int("c", 4, "ping counter")
-	timeout   = flag.String("timeout", "1s", `connect timeout, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
-	interval  = flag.String("interval", "1s", `ping interval, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
-)
-
-//Protocol not used yet
-type Protocol int
-
-const (
-	tcp Protocol = iota
-	udp
-	icmp
-	web
+	proto      = flag.String("p", "tcp", "protocol, units web, tcp, udp, icmp")
+	port       = flag.Int("port", 443, "port, default is 443")
+	inWebFile  = flag.String("file", "", "specify the filename")
+	counter    = flag.Int("c", 4, "ping counter")
+	timeout    = flag.String("t", "1s", `connect timeout, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
+	interval   = flag.String("i", "1s", `ping interval, units are "ns", "us" (or "µs"), "ms", "s", "m", "h"`)
+	privileged = flag.Bool("privileged", false, "required for ICMP Ping, run as super-user")
 )
 
 func main() {
@@ -79,7 +76,7 @@ func main() {
 		CLIpinger = cliping.NewCLIping()
 		done = startCLI(CLIpinger, args, timeoutDuration, intervalDuration)
 	case "icmp":
-		done = cliping.StartICMP(args, *counter, intervalDuration, timeoutDuration)
+		done = cliping.StartICMP(args, *counter, intervalDuration, timeoutDuration, *privileged)
 
 	case "web":
 		if *inWebFile == "" {

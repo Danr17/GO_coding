@@ -32,6 +32,7 @@
                         <th scope="col">#</th>
                         <th scope="col">Host</th>
                         <th scope="col">IP</th>
+                        <th scope="col">Protocol : Port</th>
                         <th scope="col">Status</th>
                         <th scope="col">Last Reachable</th>
                         <th scope="col">Min</th>
@@ -45,6 +46,7 @@
                         <th scope="row">{{$i}}</th>
                         <td style="text-align: left">{{$a.Target.HostName}}</td>
                         <td style="text-align: left">{{$a.Target.Host}}</td>
+                        <td style="text-align: left">{{$a.Target.Proto}} : {{$a.Target.Port}}</td>
                         {{if $a.Result.Status}}
                         <td style="text-align: left" class="text-success">ONLINE</td>
                         {{else}}
