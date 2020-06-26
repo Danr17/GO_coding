@@ -1,4 +1,4 @@
-# Web TCP Ping & ClI TCP Ping.
+# Web Ping & ClI TCP/UDP/ICMP Ping.
 
 ## Download your version
 In the archive you should find:
