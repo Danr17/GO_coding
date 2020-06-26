@@ -41,7 +41,7 @@ func NewWebPing(targets []*ping.Target) *WebPing {
 }
 
 // Start a webping
-func (webping WebPing) Start(done chan struct{}) {
+func (webping WebPing) Start(done chan bool) {
 	var wg sync.WaitGroup
 startLoop:
 	for {

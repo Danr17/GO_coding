@@ -2,6 +2,7 @@ package cliping
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"time"
@@ -10,13 +11,15 @@ import (
 )
 
 //StartICMP starts an icmp ping
-func StartICMP(args []string, count int, timeoutDuration time.Duration, intervalDuration time.Duration) {
+func StartICMP(args []string, count int, timeoutDuration time.Duration, intervalDuration time.Duration) chan bool {
 	fmt.Println(count, timeoutDuration, intervalDuration)
 	pinger, err := icmpPing.NewPinger(args[0])
 	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
-		return
+		log.Fatalf("ERROR: %s\n", err.Error())
 	}
+
+	//notify the main function that it is done
+	done := make(chan bool)
 
 	// listen for ctrl-C signal
 	c := make(chan os.Signal, 1)
@@ -46,4 +49,6 @@ func StartICMP(args []string, count int, timeoutDuration time.Duration, interval
 
 	fmt.Printf("PING %s (%s):\n", pinger.Addr(), pinger.IPAddr())
 	pinger.Run()
+	close(done)
+	return done
 }

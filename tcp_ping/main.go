@@ -55,7 +55,7 @@ func main() {
 	//catch CTRL-C
 	sigs := make(chan os.Signal, 1)
 	//notify web to stop
-	done := make(chan struct{}, 1)
+	done := make(chan bool, 1)
 	//channel to listen for errors coming from the listener.
 	serverErrors := make(chan error, 1)
 
@@ -77,9 +77,9 @@ func main() {
 	switch *proto {
 	case "tcp", "udp":
 		CLIpinger = cliping.NewCLIping()
-		startCLI(CLIpinger, args, timeoutDuration, intervalDuration)
+		done = startCLI(CLIpinger, args, timeoutDuration, intervalDuration)
 	case "icmp":
-		cliping.StartICMP(args, *counter, intervalDuration, timeoutDuration)
+		done = cliping.StartICMP(args, *counter, intervalDuration, timeoutDuration)
 
 	case "web":
 		if *inWebFile == "" {
@@ -99,18 +99,20 @@ func main() {
 
 	}
 
-	go func() {
-		select {
-		case err := <-serverErrors:
-			log.Fatalf("error: starting server: %s", err)
-		case <-sigs:
-			if *proto == "web" {
-				server.Close()
-				return
-			}
-			CLIpinger.Stop()
+	select {
+	case err := <-serverErrors:
+		log.Fatalf("error: starting server: %s", err)
+	case <-sigs:
+		if *proto == "web" {
+			log.Println("Closing HTTP server")
+			server.Close()
+			close(done)
 			return
-
 		}
-	}()
+		CLIpinger.Stop()
+		return
+	case <-done:
+		return
+	}
+
 }

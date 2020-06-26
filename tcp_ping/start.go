@@ -14,7 +14,7 @@ import (
 	webping "github.com/Danr17/GO_scripts/tree/master/tcp_ping/pkg/web_ping"
 )
 
-func startCLI(pinger *cliping.CLIping, args []string, timeoutDuration time.Duration, intervalDuration time.Duration) {
+func startCLI(pinger *cliping.CLIping, args []string, timeoutDuration time.Duration, intervalDuration time.Duration) chan bool {
 	if len(args) < 1 {
 		fmt.Println(usage)
 		os.Exit(1)
@@ -36,6 +36,7 @@ func startCLI(pinger *cliping.CLIping, args []string, timeoutDuration time.Durat
 	pinger.Start()
 	<-pinger.Done
 	fmt.Println(pinger.Result())
+	return (pinger.Done)
 
 }
 
