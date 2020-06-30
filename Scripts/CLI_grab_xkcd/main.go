@@ -3,10 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/Danr17/GO_scripts/tree/master/Scripts/CLI_grab_xkcd/client"
 	"log"
 	"time"
-
-	"github.com/erybz/go-grab-xkcd/client"
 )
 
 func main() {
