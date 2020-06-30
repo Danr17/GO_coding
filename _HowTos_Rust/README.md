@@ -1,1 +1,0 @@
-Code Samples of usual tasks in Rust.
