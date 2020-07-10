@@ -35,10 +35,10 @@ tcp_ping-windows-amd64.tar.gz
 3. ping over UDP with defaults
 	> ping_util-linux-amd64 -p udp example.com
 
-4. ping over ICMP in Privilege (run as super-user) mode !!!
-	> sudo ./ping_util -p icmp -privilege example.com
-5. ping over ICMP without Privilege mode, is actually over UDP
-	> sudo ./ping_util -p icmp -privilege example.com
+4. ping over ICMP in Privileged (run as super-user) mode !!!
+	> sudo ./ping_util -p icmp -privileged example.com
+5. ping over ICMP without Privileged mode, is actually over UDP
+	> sudo ./ping_util -p icmp -privileged example.com
 
 ## Example
 
