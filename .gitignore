@@ -1,0 +1,6 @@
+.vscode/
+test.py
+venv/
+.idea/
+__pycache__/
+NLP/Google_edu_Text_Classification/data/
