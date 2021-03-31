@@ -1,0 +1,40 @@
+Compute Engine:
+
+* Network
+Method: networks.list (project)
+Method: subnetworks.listUsable (project)
+https://cloud.google.com/compute/docs/reference/rest/v1/addresses
+Method: addresses.aggregatedList (project)
+Method: publicAdvertisedPrefixes.list (project)
+Method: routes.list (project) - general
+
+* LoadBalancer
+Method: backendServices.aggregatedList (project) - general
+Method: backendServices.getHealth - (project, resourceId) - specific
+Method: forwardingRules.aggregatedList (project)
+Method: healthChecks.aggregatedList (project)
+Method: networkEndpointGroups.aggregatedList (project) ??
+Method: sslCertificates.aggregatedList (project) - general
+Method: sslPolicies.list (project) - general
+To see everithin on Target...proxies
+
+* Vpn
+Method: forwardingRules.list (project, region)
+Method: externalVpnGateways.list
+
+* Firewall
+Method: firewalls.list (project) - general
+Method: firewallPolicies.getRule (resourceID) - specific
+Method: firewallPolicies.list
+
+* Interconnects
+Method: interconnects.list (project) - general
+Method: interconnects.getDiagnostics (project, resourceID) - specific
+
+* Routers 
+Method: routers.aggregatedList (project) - general
+Method: routers.getRouterStatus (project, region, resourceId) - specific
+
+* Others 
+Method: packetMirrorings.aggregatedList( project)
+Method: projects.get (project) -- maybe to check the quota
